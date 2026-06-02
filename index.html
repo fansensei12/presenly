@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(135% 135% at top left, #0d0218 0%, #130520 35%, #1a0508 65%, #050010 100%);
+      background-attachment: fixed;
+      overscroll-behavior: none;
+    }
+
+    /* ── Sticky header ─────────────────────────────────────── */
+    #siteHeader {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      will-change: transform;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    /* ── Smooth global transitions ─────────────────────────── */
+    button, select, input, textarea, a {
+      transition: background-color 0.15s ease, border-color 0.15s ease,
+                  color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    /* ── Modal entrance ────────────────────────────────────── */
+    .modal-box {
+      animation: modalIn 0.2s cubic-bezier(0.34, 1.36, 0.64, 1) both;
+      will-change: transform, opacity;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.93) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── Toast entrance ────────────────────────────────────── */
+    .toast-enter { animation: toastIn 0.25s ease both; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3b0764; border-radius: 20px; border: 1px solid #dc2626; }
+
+    /* ── Wheel ─────────────────────────────────────────────── */
+    #wheelCanvas { display: block; margin: 0 auto; border-radius: 50%; cursor: pointer; }
+    .wheel-pointer {
+      width: 0; height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 32px solid #ef4444;
+      filter: drop-shadow(0 2px 8px #ef444480);
+      margin: 0 auto;
+    }
+
+    /* ── Timer pulse ───────────────────────────────────────── */
+    @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+    .timer-urgent { animation: timerPulse 0.5s infinite; color: #f87171 !important; border-color: #ef444440 !important; }
+
+    /* ── Jurnal panel collapse ─────────────────────────────── */
+    #jurnalPanelBody { will-change: max-height, opacity; }
+
+    /* ── Kalkulator tombol ─────────────────────────────────── */
+    .kalc-num {
+      background: #1e1b2e; border: 1px solid #3b3560; color: #e2e8f0;
+      font-size: 1.25rem; font-weight: 800; border-radius: 0.875rem;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kalc-num:active { background: #2d2a45; transform: scale(0.93); }
+    .kalc-op {
+      background: #1a1230; border: 1px solid #6d28d9; color: #c4b5fd;
+      font-size: 1.4rem; font-weight: 900; border-radius: 0.875rem;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kalc-op:active { background: #2e1065; transform: scale(0.93); }
+    .kalc-fn {
+      background: #1a1020; border: 1px solid #831843; color: #f9a8d4;
+      font-size: 1rem; font-weight: 800; border-radius: 0.875rem;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kalc-fn:active { background: #500724; transform: scale(0.93); }
+    .kalc-sci {
+      background: #0f1a2e; border: 1px solid #1e40af; color: #93c5fd;
+      font-size: 0.95rem; font-weight: 800; border-radius: 0.875rem;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kalc-sci:active { background: #1e3a8a; transform: scale(0.93); }
+    .kalc-eq {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      border: none; color: #000;
+      font-size: 1.5rem; font-weight: 900; border-radius: 0.875rem;
+      padding: 1.1rem 0; cursor: pointer; transition: filter 0.1s, transform 0.08s;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px #f59e0b40;
+    }
+    .kalc-eq:active { filter: brightness(1.2); transform: scale(0.93); }
+
+  </style>
+</head>
+<body class="text-slate-100/90 antialiased min-h-screen flex flex-col justify-between">
+
+  <header id="siteHeader" class="border-b border-red-500/20 bg-black/85 backdrop-blur-md px-4 sm:px-6 py-4 shadow-xl shadow-red-950/20">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-red-700 via-purple-600 to-blue-600 text-white p-2.5 rounded-xl shadow-md shadow-purple-500/30 flex items-center justify-center">
+          <span class="material-icons-sharp text-xl font-bold">auto_stories</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-red-200 to-blue-400 bg-clip-text text-transparent">Presenly</h1>
+          <p class="text-[10px] font-bold text-purple-400 tracking-widest uppercase">Presence & Grade System</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-blue-300 bg-blue-500/10 border border-blue-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+          <span>Siswa: <span id="jumlahSiswa">0</span></span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent" class="max-w-7xl mx-auto w-full px-4 sm:px-6 my-4 sm:my-6 flex flex-col gap-6 flex-grow">
+    
+    <section class="bg-black/40 border border-purple-500/20 rounded-2xl p-3 shadow-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div class="relative w-full md:w-auto md:min-w-[200px]">
+        <select id="dropdownKelas" onchange="loadSiswa()" class="w-full bg-slate-950 border border-purple-500/30 hover:border-red-400 rounded-xl pl-4 pr-10 py-2.5 text-xs font-bold text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all appearance-none cursor-pointer">
+          <option value="">-- Tentukan Kelas --</option>
+        </select>
+        <span class="material-icons-sharp absolute right-3 top-2.5 text-purple-400 text-lg pointer-events-none">expand_more</span>
+      </div>
+
+      <div class="flex bg-slate-950 p-1 rounded-xl border border-purple-500/20 w-full md:w-auto">
+        <button onclick="switchTab('presensi')" id="tabBtnPresensi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black">
+          <span class="material-icons-sharp text-sm">fact_check</span>
+          <span>Presensi</span>
+        </button>
+        <button onclick="switchTab('penilaian')" id="tabBtnPenilaian" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200">
+          <span class="material-icons-sharp text-sm">stars</span>
+          <span>Penilaian</span>
+        </button>
+      </div>
+
+      <!-- Toolbar Fitur -->
+      <div class="w-full md:w-auto">
+        <!-- Label section -->
+        <p class="text-[9px] font-black text-purple-400/50 uppercase tracking-widest mb-2 md:hidden">Fitur</p>
+        <!-- Grid tombol: 4 kolom di mobile, auto di desktop -->
+        <div class="grid grid-cols-4 md:flex md:flex-row gap-2 md:gap-2">
+          <!-- Timer -->
+          <button onclick="toggleTimerModal()" title="Timer"
+            class="flex flex-col md:flex-row items-center justify-center md:justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-red-400 text-xl md:text-base">timer</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Timer</span>
+          </button>
+          <!-- Kelompok -->
+          <button onclick="acakKelompok()" title="Kelompok"
+            class="flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-blue-400 text-xl md:text-base">shuffle</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Kelompok</span>
+          </button>
+          <!-- Wheel -->
+          <button onclick="toggleWheelModal()" title="Wheel Siswa"
+            class="flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-purple-400 text-xl md:text-base">casino</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Wheel</span>
+          </button>
+          <!-- Translate -->
+          <button onclick="toggleTranslateModal()" title="Translate"
+            class="flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-blue-400 text-xl md:text-base">translate</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Translate</span>
+          </button>
+          <!-- Jurnal -->
+          <button onclick="toggleJurnalModal()" title="Jurnal Pembelajaran"
+            class="flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-emerald-400 text-xl md:text-base">menu_book</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Jurnal</span>
+          </button>
+          <!-- Kalkulator -->
+          <button onclick="_modalToggle('kalkulatorModal')" title="Kalkulator"
+            class="flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-yellow-400 text-xl md:text-base">calculate</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Kalkulator</span>
+          </button>
+          <!-- Inbox -->
+          <button onclick="toggleInboxModal()" title="Inbox Tugas Siswa"
+            class="relative flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-2.5 md:p-2.5 transition-all cursor-pointer">
+            <span class="material-icons-sharp text-orange-400 text-xl md:text-base">inbox</span>
+            <span class="text-[9px] font-black text-slate-400 md:hidden">Inbox</span>
+            <span id="inboxBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-lg">0</span>
+          </button>
+          <!-- Nilai Siswa -->
+          <button onclick="toggleNilaiModal()" id="btnNilai"
+            class="relative flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-0 bg-slate-900 hover:bg-indigo-500/10 border border-slate-700 hover:border-indigo-500/50 text-slate-400 hover:text-indigo-300 rounded-xl py-2.5 md:p-1.5 transition-all cursor-pointer" title="Rekap Nilai Sumatif">
+            <span class="material-icons-sharp text-indigo-400 text-xl md:text-base">bar_chart</span>
+            <span class="text-[9px] font-black md:hidden">Nilai</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-grow">
+      
+      <div class="order-2 lg:order-1 lg:col-span-8 bg-black/20 border border-purple-500/20 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-auto min-h-[300px]">
+        
+        <div id="loadingSiswa" class="hidden p-16 text-center flex-grow flex flex-col items-center justify-center text-purple-400/60">
+          <div class="animate-spin w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full mb-3"></div>
+          <p class="text-xs font-semibold tracking-wide">Sinkronisasi data Presenly...</p>
+        </div>
+
+        <div id="placeholderSiswa" class="p-16 text-center flex-grow flex flex-col items-center justify-center text-purple-400/40">
+          <div class="bg-slate-950 p-4 rounded-2xl mb-3 border border-purple-500/10 shadow-inner">
+            <span class="material-icons-sharp text-3xl block text-purple-400/40">dns</span>
+          </div>
+          <p class="text-xs font-bold">Ruang Kelas Belum Terpilih</p>
+        </div>
+
+        <div id="tabelContainer" class="hidden flex-col justify-between w-full">
+          <div class="w-full">
+            <div class="hidden sm:grid grid-cols-12 border-b border-purple-500/20 bg-slate-950/60 p-4 text-[10px] font-bold uppercase tracking-widest text-blue-400/70">
+              <div class="col-span-5 text-sm">Informasi Siswa</div>
+              <div id="thAksi" class="col-span-7 text-center text-sm">Status Presensi</div>
+            </div>
+            
+            <div id="listSiswaMaster" class="p-2 sm:p-0 divide-y divide-purple-500/10 space-y-3 sm:space-y-0">
+              </div>
+          </div>
+          
+          <div class="p-4 bg-slate-950/40 border-t border-purple-500/20 flex justify-end">
+            <button onclick="simpanKeDatabase()" id="btnSimpan" class="w-full sm:w-auto bg-gradient-to-r from-red-700 via-purple-600 to-blue-600 text-white font-black text-xs px-6 py-3.5 rounded-xl shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-icons-sharp text-base font-bold">cloud_done</span> 
+              <span id="btnTextSimpan">Simpan Rekap Presensi</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-1 lg:order-2 lg:col-span-4 bg-black/20 border border-purple-500/20 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300" id="jurnalPanel">
+        <div class="flex items-center justify-between p-5 border-b border-purple-500/20 cursor-pointer select-none" onclick="toggleJurnalPanel()">
+          <div class="flex items-center space-x-2">
+            <span class="material-icons-sharp text-sm text-red-400">edit_note</span>
+            <h2 class="text-xs font-extrabold uppercase text-blue-300 tracking-wider">Atribut Jurnal</h2>
+          </div>
+          <span id="jurnalPanelIcon" class="material-icons-sharp text-purple-400/60 text-base transition-transform duration-300" style="transform:rotate(180deg)">expand_less</span>
+        </div>
+        <div id="jurnalPanelBody" class="p-5 space-y-4 transition-all duration-300" style="max-height:0;opacity:0;padding-top:0;padding-bottom:0;overflow:hidden">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-red-300/80">Materi Pokok</label>
+            <div class="relative">
+              <span class="material-icons-sharp absolute left-3 top-2.5 text-purple-400/60 text-base">menu_book</span>
+              <input type="text" id="materi" placeholder="Materi diajarkan..." class="w-full bg-slate-950 border border-purple-500/20 rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all">
+            </div>
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-purple-300/80">JP & Jenis Penilaian</label>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-purple-400/60 text-base">schedule</span>
+                <input type="number" id="jp" min="1" max="12" value="2" placeholder="JP" title="Jam Pelajaran" class="w-full bg-slate-950 border border-purple-500/20 rounded-xl pl-9 pr-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all">
+              </div>
+              <div class="relative flex-1">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-yellow-500/50 text-base">tag</span>
+                <select id="jnGlobal" onchange="terapkanJNGlobal(this.value)" title="Jenis Penilaian" class="w-full bg-slate-950 border border-yellow-500/20 hover:border-yellow-400 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-yellow-300 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all appearance-none cursor-pointer">
+                  <option value="1">Sumatif 1</option>
+                  <option value="2">Sumatif 2</option>
+                  <option value="3">Sumatif 3</option>
+                </select>
+              </div>
+            </div>
+            <p class="text-[9px] text-slate-500 font-medium italic">JN mengisi semua siswa sekaligus</p>
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-blue-300/80">Catatan Kejadian</label>
+            <textarea id="catatan" rows="3" placeholder="Siswa aktif, hambatan kelas, dll..." class="w-full bg-slate-950 border border-purple-500/20 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all resize-none"></textarea>
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-yellow-300/80">Keterangan</label>
+              <span class="text-[10px] text-slate-500 font-medium italic">Kosong = otomatis siswa tidak hadir</span>
+            </div>
+            <div class="relative">
+              <span class="material-icons-sharp absolute left-3 top-2.5 text-yellow-500/50 text-base">info</span>
+              <input type="text" id="keterangan" placeholder="Kosongkan untuk otomatis..." class="w-full bg-slate-950 border border-yellow-500/20 rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="text-center py-4 text-[11px] font-bold text-purple-600/40 border-t border-purple-500/10 max-w-7xl mx-auto w-full px-6">
+    &copy; 2026 Presenly &bull; Premium Gold Solid Framework
+  </footer>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0"></div>
+
+  <div id="timerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-sm w-full p-5 m-4 relative">
+      <button onclick="toggleTimerModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <span class="material-icons-sharp block text-base">close</span>
+      </button>
+
+      <!-- Tab switcher -->
+      <div class="flex gap-1 mb-4">
+        <button onclick="switchTimerTab('timer')" id="tTabBtnTimer" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md">
+          <span class="material-icons-sharp text-sm">timer</span> Timer
+        </button>
+        <button onclick="switchTimerTab('stopwatch')" id="tTabBtnSW" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-blue-400/70 hover:text-blue-200 border border-blue-500/20">
+          <span class="material-icons-sharp text-sm">timer_off</span> Stopwatch
+        </button>
+      </div>
+
+      <!-- ══ TAB TIMER ══ -->
+      <div id="tPanelTimer" class="space-y-4 text-center">
+        <div class="text-red-300 font-extrabold text-[10px] tracking-widest uppercase">Timer Aktivitas</div>
+        <div id="timerDisplay" class="text-5xl font-extrabold tracking-tight text-blue-300 font-mono py-5 bg-black rounded-2xl border border-purple-500/10 shadow-inner">05:00</div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="flex flex-col gap-1.5 bg-black/40 p-2 rounded-xl border border-slate-900">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Kurangi Waktu</span>
+            <div class="flex gap-1 justify-center">
+              <button onclick="modifyTimer(-60)" class="bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">-1m</button>
+              <button onclick="modifyTimer(-300)" class="bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">-5m</button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5 bg-black/40 p-2 rounded-xl border border-slate-900">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Tambah Waktu</span>
+            <div class="flex gap-1 justify-center">
+              <button onclick="modifyTimer(60)" class="bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">+1m</button>
+              <button onclick="modifyTimer(300)" class="bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">+5m</button>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center gap-2.5 pt-1">
+          <button onclick="startTimer()" class="bg-gradient-to-r from-red-600 to-purple-600 text-white p-3.5 rounded-xl shadow-lg active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base font-bold">play_arrow</span></button>
+          <button onclick="pauseTimer()" class="bg-black hover:bg-slate-900 text-blue-400 p-3.5 rounded-xl border border-blue-500/20 active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base">pause</span></button>
+          <button onclick="resetTimer()" class="bg-slate-900 text-white p-3.5 rounded-xl active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base">refresh</span></button>
+        </div>
+      </div>
+
+      <!-- ══ TAB STOPWATCH ══ -->
+      <div id="tPanelSW" class="hidden space-y-4 text-center">
+        <div class="text-blue-300 font-extrabold text-[10px] tracking-widest uppercase">Stopwatch</div>
+        <div id="swDisplay" class="text-5xl font-extrabold tracking-tight text-emerald-300 font-mono py-5 bg-black rounded-2xl border border-emerald-500/10 shadow-inner">00:00<span class="text-2xl text-emerald-500/60">.00</span></div>
+
+        <!-- Lap list -->
+        <div id="swLapList" class="hidden max-h-36 overflow-y-auto bg-black/40 rounded-xl border border-emerald-500/10 text-left px-3 py-2 space-y-1"></div>
+
+        <div class="flex justify-center gap-2.5 pt-1">
+          <button onclick="startStopwatch()" id="btnSwPlay" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white p-3.5 rounded-xl shadow-lg active:scale-90 cursor-pointer" title="Mulai">
+            <span class="material-icons-sharp text-base font-bold">play_arrow</span>
+          </button>
+          <button onclick="pauseStopwatch()" id="btnSwPause" class="bg-black hover:bg-slate-900 text-emerald-400 p-3.5 rounded-xl border border-emerald-500/20 active:scale-90 cursor-pointer" title="Jeda">
+            <span class="material-icons-sharp text-base">pause</span>
+          </button>
+          <button onclick="lapStopwatch()" id="btnSwLap" class="bg-black hover:bg-slate-900 text-blue-300 p-3.5 rounded-xl border border-blue-500/20 active:scale-90 cursor-pointer" title="Lap">
+            <span class="material-icons-sharp text-base">flag</span>
+          </button>
+          <button onclick="resetStopwatch()" class="bg-slate-900 text-white p-3.5 rounded-xl active:scale-90 cursor-pointer" title="Reset">
+            <span class="material-icons-sharp text-base">refresh</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="kelompokModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-2xl w-full p-5 m-4 max-h-[85vh] flex flex-col relative">
+      <button onclick="toggleKelompokModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <span class="material-icons-sharp block text-base">close</span>
+      </button>
+      <div class="flex items-center space-x-2 mb-4">
+        <span class="material-icons-sharp text-red-400 text-lg">groups</span>
+        <h3 class="text-base font-extrabold text-slate-100">Pembagian Kelompok Kerja</h3>
+      </div>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3 bg-black p-3 rounded-xl border border-purple-500/10">
+        <div class="flex items-center gap-2">
+          <label class="text-[10px] font-bold text-blue-300/70 uppercase tracking-wide">Bagi Menjadi:</label>
+          <div class="flex items-center bg-slate-900 border border-purple-500/20 rounded-lg px-2 py-0.5">
+            <input type="number" id="jumlahKelompokInput" value="4" min="2" max="12" class="w-10 text-center font-extrabold text-blue-300 focus:outline-none bg-transparent text-sm">
+            <span class="text-[11px] font-bold text-purple-400/50 pr-1">Grup</span>
+          </div>
+        </div>
+        <button onclick="prosesAcak()" class="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white text-[11px] font-extrabold px-3 py-2 rounded-lg cursor-pointer transition-all">Acak Formasi</button>
+      </div>
+      <div id="hasilKelompokContainer" class="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4 p-0.5 flex-grow"></div>
+    </div>
+  </div>
+
+  <!-- ===== WHEEL MODAL ===== -->
+  <div id="wheelModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-md w-full p-5 m-4 relative flex flex-col items-center gap-4">
+      <button onclick="toggleWheelModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <span class="material-icons-sharp block text-base">close</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <span class="material-icons-sharp text-purple-400 text-lg">casino</span>
+        <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Wheel Pilih Siswa</h3>
+      </div>
+      <div class="wheel-pointer"></div>
+      <canvas id="wheelCanvas" width="300" height="300"></canvas>
+      <div id="wheelResult" class="hidden text-center px-6 py-3 bg-black rounded-2xl border border-purple-500/20 w-full">
+        <p class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">Terpilih</p>
+        <p id="wheelResultText" class="text-lg font-extrabold text-white"></p>
+      </div>
+      <div class="flex gap-3 w-full">
+        <button onclick="putarWheel()" id="btnPutarWheel" class="flex-1 bg-gradient-to-r from-red-600 to-purple-600 text-white font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all">
+          <span class="material-icons-sharp text-base">rotate_right</span> Putar!
+        </button>
+        <button onclick="acakUlangWheel()" class="bg-slate-900 border border-purple-500/20 text-purple-300 font-bold text-xs py-3 px-4 rounded-xl cursor-pointer hover:border-purple-400 transition-all">
+          <span class="material-icons-sharp text-base">refresh</span>
+        </button>
+      </div>
+      <p class="text-[10px] text-purple-500/50 font-bold">Gunakan daftar siswa kelas yang aktif</p>
+    </div>
+  </div>
+
+  <!-- ===== TRANSLATE MODAL ===== -->
+  <div id="translateModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-blue-500/30 max-w-lg w-full p-5 m-4 relative flex flex-col gap-4">
+      <button onclick="toggleTranslateModal()" class="absolute top-4 right-4 text-blue-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <span class="material-icons-sharp block text-base">close</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <span class="material-icons-sharp text-blue-400 text-lg">translate</span>
+        <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Translate Teks</h3>
+      </div>
+      <div class="flex items-center gap-2 bg-black/40 rounded-xl p-2 border border-blue-500/10">
+        <select id="translateFrom" class="flex-1 bg-slate-900 border border-blue-500/20 rounded-lg px-3 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+          <option value="id">🇮🇩 Indonesia</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="ar">🇸🇦 Arab</option>
+          <option value="ja">🇯🇵 Jepang</option>
+          <option value="ko">🇰🇷 Korea</option>
+          <option value="zh">🇨🇳 Mandarin</option>
+          <option value="fr">🇫🇷 Prancis</option>
+          <option value="de">🇩🇪 Jerman</option>
+          <option value="es">🇪🇸 Spanyol</option>
+        </select>
+        <button onclick="swapLang()" class="text-purple-400 hover:text-red-300 p-2 cursor-pointer transition-all">
+          <span class="material-icons-sharp text-base">swap_horiz</span>
+        </button>
+        <select id="translateTo" class="flex-1 bg-slate-900 border border-blue-500/20 rounded-lg px-3 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+          <option value="en">🇬🇧 English</option>
+          <option value="id">🇮🇩 Indonesia</option>
+          <option value="ar">🇸🇦 Arab</option>
+          <option value="ja">🇯🇵 Jepang</option>
+          <option value="ko">🇰🇷 Korea</option>
+          <option value="zh">🇨🇳 Mandarin</option>
+          <option value="fr">🇫🇷 Prancis</option>
+          <option value="de">🇩🇪 Jerman</option>
+          <option value="es">🇪🇸 Spanyol</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-blue-400/70 uppercase tracking-widest">Teks Sumber</label>
+          <textarea id="translateInput" rows="5" placeholder="Ketik teks di sini..." class="w-full bg-black border border-blue-500/20 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all resize-none"></textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-purple-400/70 uppercase tracking-widest">Hasil Terjemahan</label>
+          <div id="translateOutput" class="w-full min-h-[100px] bg-black/60 border border-purple-500/20 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-200 select-all whitespace-pre-wrap break-words"></div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="doTranslate()" id="btnTranslate" class="flex-1 bg-gradient-to-r from-blue-700 to-purple-600 text-white font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all">
+          <span class="material-icons-sharp text-base">translate</span> Terjemahkan
+        </button>
+        <button onclick="copyTranslation()" class="bg-slate-900 border border-blue-500/20 text-blue-300 font-bold text-xs py-3 px-4 rounded-xl cursor-pointer hover:border-blue-400 transition-all" title="Salin hasil">
+          <span class="material-icons-sharp text-base">content_copy</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JURNAL MODAL ===== -->
+  <div id="jurnalModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-emerald-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-sharp text-emerald-400 text-lg">menu_book</span>
+          <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Jurnal Pembelajaran</h3>
+        </div>
+        <button onclick="toggleJurnalModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+          <span class="material-icons-sharp block text-base">close</span>
+        </button>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="flex gap-1 px-5 pb-3 shrink-0 flex-wrap">
+        <button onclick="switchJurnalTab('rekap')" id="jTabBtnRekap" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md">
+          <span class="material-icons-sharp text-sm">dashboard</span> Rekap Sesi
+        </button>
+        <button onclick="switchJurnalTab('sheet')" id="jTabBtnSheet" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-emerald-400/70 hover:text-emerald-200 border border-emerald-500/20">
+          <span class="material-icons-sharp text-sm">table_chart</span> Sheet Jurnal
+        </button>
+        <button onclick="switchJurnalTab('hadir')" id="jTabBtnHadir" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-emerald-400/70 hover:text-emerald-200 border border-emerald-500/20">
+          <span class="material-icons-sharp text-sm">how_to_reg</span> Rekap Hadir
+        </button>
+      </div>
+
+      <!-- ══ TAB REKAP SESI ══ -->
+      <div id="jPanelRekap" class="flex flex-col flex-1 overflow-hidden">
+        <!-- Filter bar -->
+        <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-y border-emerald-500/10 bg-black/30 shrink-0">
+          <div class="relative flex-1 min-w-[150px]">
+            <select id="jurnalFilterKelas" onchange="loadJurnal()" class="w-full bg-slate-900 border border-emerald-500/20 hover:border-emerald-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none cursor-pointer">
+              <option value="">-- Semua Kelas --</option>
+            </select>
+            <span class="material-icons-sharp absolute right-2 top-2 text-emerald-500/60 text-sm pointer-events-none">expand_more</span>
+          </div>
+          <div class="relative flex-1 min-w-[120px]">
+            <select id="jurnalFilterTipe" onchange="filterJurnalLokal()" class="w-full bg-slate-900 border border-emerald-500/20 hover:border-emerald-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none cursor-pointer">
+              <option value="">Semua Tipe</option>
+              <option value="presensi">Presensi</option>
+              <option value="penilaian">Penilaian</option>
+            </select>
+            <span class="material-icons-sharp absolute right-2 top-2 text-emerald-500/60 text-sm pointer-events-none">expand_more</span>
+          </div>
+          <div class="relative flex-1 min-w-[150px]">
+            <span class="material-icons-sharp absolute left-3 top-2 text-emerald-500/50 text-sm pointer-events-none">search</span>
+            <input type="text" id="jurnalSearch" oninput="filterJurnalLokal()" placeholder="Cari materi / catatan..." class="w-full bg-slate-900 border border-emerald-500/20 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl shrink-0">
+            <span class="material-icons-sharp text-sm">history_edu</span>
+            <span id="jurnalJumlah">0</span> sesi
+          </div>
+        </div>
+        <div id="jurnalLoading" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/50">
+          <div class="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+          <p class="text-xs font-semibold">Memuat jurnal...</p>
+        </div>
+        <div id="jurnalEmpty" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/30">
+          <span class="material-icons-sharp text-4xl mb-3">library_books</span>
+          <p class="text-xs font-bold">Belum ada jurnal tersimpan</p>
+          <p class="text-[10px] text-slate-500 mt-1">Simpan rekap terlebih dahulu</p>
+        </div>
+        <div id="jurnalList" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+        <div id="jurnalStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 py-4 border-t border-emerald-500/10 bg-black/30">
+          <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
+            <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Total Sesi</p>
+            <p id="statTotalSesi" class="text-xl font-extrabold text-emerald-300">0</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-blue-500/10 text-center">
+            <p class="text-[10px] font-bold text-blue-400/60 uppercase tracking-widest mb-1">Rata Hadir</p>
+            <p id="statRataHadir" class="text-xl font-extrabold text-blue-300">0%</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-purple-500/10 text-center">
+            <p class="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest mb-1">Rata Nilai</p>
+            <p id="statRataNilai" class="text-xl font-extrabold text-purple-300">-</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-red-500/10 text-center">
+            <p class="text-[10px] font-bold text-red-400/60 uppercase tracking-widest mb-1">Total Alpha</p>
+            <p id="statTotalAlpha" class="text-xl font-extrabold text-red-300">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB SHEET JURNAL ══ -->
+      <div id="jPanelSheet" class="hidden flex-col flex-1 overflow-hidden">
+        <!-- Filter sheet -->
+        <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-y border-emerald-500/10 bg-black/30 shrink-0">
+          <div class="relative flex-1 min-w-[150px]">
+            <select id="sheetJurnalFilterKelas" onchange="loadSheetJurnal()" class="w-full bg-slate-900 border border-emerald-500/20 hover:border-emerald-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none cursor-pointer">
+              <option value="">-- Semua Kelas --</option>
+            </select>
+            <span class="material-icons-sharp absolute right-2 top-2 text-emerald-500/60 text-sm pointer-events-none">expand_more</span>
+          </div>
+          <div class="relative flex-1 min-w-[150px]">
+            <span class="material-icons-sharp absolute left-3 top-2 text-emerald-500/50 text-sm pointer-events-none">search</span>
+            <input type="text" id="sheetJurnalSearch" oninput="filterSheetJurnalLokal()" placeholder="Cari materi..." class="w-full bg-slate-900 border border-emerald-500/20 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl shrink-0">
+            <span class="material-icons-sharp text-sm">table_rows</span>
+            <span id="sheetJurnalJumlah">0</span> baris
+          </div>
+        </div>
+
+        <!-- Loading sheet -->
+        <div id="sheetJurnalLoading" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/50">
+          <div class="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+          <p class="text-xs font-semibold">Membaca sheet Jurnal...</p>
+        </div>
+
+        <!-- Empty sheet -->
+        <div id="sheetJurnalEmpty" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/30">
+          <span class="material-icons-sharp text-4xl mb-3">table_chart</span>
+          <p class="text-xs font-bold">Sheet Jurnal masih kosong</p>
+        </div>
+
+        <!-- Tabel sheet jurnal -->
+        <div class="flex-1 overflow-auto p-4">
+          <table class="w-full text-xs border-collapse min-w-[600px]">
+            <thead class="sticky top-0 z-10">
+              <tr class="bg-slate-900 text-emerald-400/80 uppercase tracking-widest text-[10px] font-black">
+                <th class="px-3 py-2.5 text-left border-b border-emerald-500/20 w-[90px]">Tanggal</th>
+                <th class="px-3 py-2.5 text-left border-b border-emerald-500/20 w-[80px]">Kelas</th>
+                <th class="px-3 py-2.5 text-center border-b border-emerald-500/20 w-[70px]">Pertemuan</th>
+                <th class="px-3 py-2.5 text-center border-b border-emerald-500/20 w-[40px]">JP</th>
+                <th class="px-3 py-2.5 text-left border-b border-emerald-500/20">Materi</th>
+                <th class="px-3 py-2.5 text-left border-b border-emerald-500/20">Catatan</th>
+                <th class="px-3 py-2.5 text-center border-b border-emerald-500/20 w-[80px]">Tipe</th>
+              </tr>
+            </thead>
+            <tbody id="sheetJurnalTbody" class="divide-y divide-emerald-500/10"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB REKAP HADIR ══ -->
+      <div id="jPanelHadir" class="hidden flex-col flex-1 overflow-hidden">
+        <!-- Filter -->
+        <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-y border-emerald-500/10 bg-black/30 shrink-0">
+          <div class="relative flex-1 min-w-[150px]">
+            <select id="hadirFilterKelas" onchange="loadRekapHadir()" class="w-full bg-slate-900 border border-emerald-500/20 hover:border-emerald-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none cursor-pointer">
+              <option value="">-- Semua Kelas --</option>
+            </select>
+            <span class="material-icons-sharp absolute right-2 top-2 text-emerald-500/60 text-sm pointer-events-none">expand_more</span>
+          </div>
+          <div class="relative flex-1 min-w-[160px]">
+            <span class="material-icons-sharp absolute left-3 top-2 text-emerald-500/40 text-sm pointer-events-none">search</span>
+            <input type="text" id="hadirSearch" oninput="filterRekapHadirLokal()" placeholder="Cari nama siswa..." class="w-full bg-slate-900 border border-emerald-500/20 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl shrink-0">
+            <span class="material-icons-sharp text-sm">how_to_reg</span>
+            <span id="hadirJumlah">0</span> siswa
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="hadirLoading" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/50">
+          <div class="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mb-3"></div>
+          <p class="text-xs font-semibold">Memuat rekap kehadiran...</p>
+        </div>
+        <!-- Empty -->
+        <div id="hadirEmpty" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-emerald-500/30">
+          <span class="material-icons-sharp text-4xl mb-3">how_to_reg</span>
+          <p class="text-xs font-bold">Data kehadiran belum tersedia</p>
+        </div>
+
+        <!-- Tabel rekap hadir -->
+        <div class="flex-1 overflow-auto p-4">
+          <table class="w-full text-xs border-collapse min-w-[500px]">
+            <thead class="sticky top-0 z-10">
+              <tr class="bg-slate-900 text-[10px] font-black uppercase tracking-widest">
+                <th class="px-3 py-3 text-left border-b border-emerald-500/20 text-emerald-400/80">Nama Siswa</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-blue-400/80 w-[50px]">Kelas</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-emerald-400 w-[45px]">H</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-yellow-400 w-[45px]">S</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-sky-400 w-[45px]">I</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-red-400 w-[45px]">A</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-orange-400 w-[45px]">T</th>
+                <th class="px-3 py-3 text-center border-b border-emerald-500/20 text-purple-400 w-[60px]">% Hadir</th>
+              </tr>
+            </thead>
+            <tbody id="hadirTbody" class="divide-y divide-emerald-500/10"></tbody>
+          </table>
+        </div>
+
+        <!-- Footer ringkasan kelas -->
+        <div id="hadirStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-5 gap-3 px-5 py-4 border-t border-emerald-500/10 bg-black/30">
+          <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Siswa</p>
+            <p id="hadirStatSiswa" class="text-xl font-extrabold text-emerald-300">0</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
+            <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Total H</p>
+            <p id="hadirStatH" class="text-xl font-extrabold text-emerald-300">0</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-yellow-500/10 text-center">
+            <p class="text-[10px] font-bold text-yellow-400/60 uppercase tracking-widest mb-1">Total S</p>
+            <p id="hadirStatS" class="text-xl font-extrabold text-yellow-300">0</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-sky-500/10 text-center">
+            <p class="text-[10px] font-bold text-sky-400/60 uppercase tracking-widest mb-1">Total I</p>
+            <p id="hadirStatI" class="text-xl font-extrabold text-sky-300">0</p>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-red-500/10 text-center">
+            <p class="text-[10px] font-bold text-red-400/60 uppercase tracking-widest mb-1">Total A</p>
+            <p id="hadirStatA" class="text-xl font-extrabold text-red-300">0</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="inboxModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-orange-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-sharp text-orange-400 text-lg">inbox</span>
+          <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Inbox Tugas Siswa</h3>
+          <span id="inboxTotalBadge" class="hidden text-[10px] font-black bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-full">0 tugas</span>
+        </div>
+        <button onclick="toggleInboxModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+          <span class="material-icons-sharp block text-base">close</span>
+        </button>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-y border-orange-500/10 bg-black/30 shrink-0">
+        <div class="relative flex-1 min-w-[140px]">
+          <select id="inboxFilterKelas" onchange="filterInboxLokal()" class="w-full bg-slate-900 border border-orange-500/20 hover:border-orange-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none cursor-pointer">
+            <option value="">-- Semua Kelas --</option>
+          </select>
+          <span class="material-icons-sharp absolute right-2 top-2 text-orange-500/50 text-sm pointer-events-none">expand_more</span>
+        </div>
+        <div class="relative flex-1 min-w-[140px]">
+          <select id="inboxFilterMode" onchange="filterInboxLokal()" class="w-full bg-slate-900 border border-orange-500/20 hover:border-orange-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500 appearance-none cursor-pointer">
+            <option value="">Semua Mode</option>
+            <option value="file">File</option>
+            <option value="link">Link</option>
+            <option value="teks">Teks</option>
+          </select>
+          <span class="material-icons-sharp absolute right-2 top-2 text-orange-500/50 text-sm pointer-events-none">expand_more</span>
+        </div>
+        <div class="relative flex-1 min-w-[160px]">
+          <span class="material-icons-sharp absolute left-3 top-2 text-orange-500/40 text-sm pointer-events-none">search</span>
+          <input type="text" id="inboxSearch" oninput="filterInboxLokal()" placeholder="Cari nama / judul tugas..." class="w-full bg-slate-900 border border-orange-500/20 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500">
+        </div>
+        <button onclick="loadInbox()" class="flex items-center gap-1.5 px-3 py-2 bg-orange-500/10 border border-orange-500/20 hover:border-orange-400 text-orange-300 text-xs font-bold rounded-xl cursor-pointer transition-all">
+          <span class="material-icons-sharp text-sm">refresh</span> Refresh
+        </button>
+        <div class="flex items-center gap-1.5 text-xs font-bold text-orange-400/70 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl shrink-0">
+          <span class="material-icons-sharp text-sm">assignment</span>
+          <span id="inboxJumlah">0</span> tugas
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="inboxLoading" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-orange-500/50">
+        <div class="animate-spin w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full mb-3"></div>
+        <p class="text-xs font-semibold">Memuat inbox tugas...</p>
+      </div>
+
+      <!-- Empty -->
+      <div id="inboxEmpty" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-orange-500/30">
+        <span class="material-icons-sharp text-4xl mb-3">inbox</span>
+        <p class="text-xs font-bold">Inbox kosong</p>
+        <p class="text-[10px] text-slate-500 mt-1">Belum ada tugas masuk dari siswa</p>
+      </div>
+
+      <!-- Tabel inbox -->
+      <div class="flex-1 overflow-auto p-4">
+        <table class="w-full text-xs border-collapse min-w-[700px]">
+          <thead class="sticky top-0 z-10">
+            <tr class="bg-slate-900 text-orange-400/80 uppercase tracking-widest text-[10px] font-black">
+              <th class="px-3 py-3 text-left border-b border-orange-500/20 w-[120px]">Waktu</th>
+              <th class="px-3 py-3 text-left border-b border-orange-500/20">Nama Siswa</th>
+              <th class="px-3 py-3 text-center border-b border-orange-500/20 w-[40px]">No</th>
+              <th class="px-3 py-3 text-center border-b border-orange-500/20 w-[60px]">Kelas</th>
+              <th class="px-3 py-3 text-left border-b border-orange-500/20">Judul Tugas</th>
+              <th class="px-3 py-3 text-left border-b border-orange-500/20">Catatan</th>
+              <th class="px-3 py-3 text-center border-b border-orange-500/20 w-[60px]">Mode</th>
+              <th class="px-3 py-3 text-center border-b border-orange-500/20 w-[80px]">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="inboxTbody" class="divide-y divide-orange-500/10"></tbody>
+        </table>
+      </div>
+
+      <!-- Footer stats -->
+      <div id="inboxStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 py-4 border-t border-orange-500/10 bg-black/30">
+        <div class="bg-black/40 rounded-xl p-3 border border-orange-500/10 text-center">
+          <p class="text-[10px] font-bold text-orange-400/60 uppercase tracking-widest mb-1">Total Tugas</p>
+          <p id="inboxStatTotal" class="text-xl font-extrabold text-orange-300">0</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-blue-500/10 text-center">
+          <p class="text-[10px] font-bold text-blue-400/60 uppercase tracking-widest mb-1">Hari Ini</p>
+          <p id="inboxStatHariIni" class="text-xl font-extrabold text-blue-300">0</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-purple-500/10 text-center">
+          <p class="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest mb-1">Kelas Unik</p>
+          <p id="inboxStatKelas" class="text-xl font-extrabold text-purple-300">0</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
+          <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Mode File</p>
+          <p id="inboxStatFile" class="text-xl font-extrabold text-emerald-300">0</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ===== KALKULATOR MODAL ===== -->
+  <div id="kalkulatorModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-yellow-500/30 w-full max-w-md m-4 relative overflow-hidden">
+
+      <button onclick="_modalToggle('kalkulatorModal')" class="absolute top-4 right-4 text-yellow-400/50 hover:text-red-300 p-1 rounded-xl cursor-pointer z-10">
+        <span class="material-icons-sharp text-base">close</span>
+      </button>
+
+      <!-- Display -->
+      <div class="bg-black/60 px-6 pt-8 pb-5 border-b border-yellow-500/10">
+        <div id="kalcExpr" class="text-right text-sm text-slate-500 font-mono min-h-[22px] tracking-wider truncate">&nbsp;</div>
+        <div id="kalcDisplay" class="text-right text-5xl font-extrabold text-white font-mono mt-2 tracking-tight truncate transition-all">0</div>
+        <div id="kalcMode" class="text-right text-[10px] font-bold text-yellow-500/60 uppercase tracking-widest mt-2">Standard</div>
+      </div>
+
+      <!-- Tab mode -->
+      <div class="flex gap-2 px-5 pt-4 pb-1">
+        <button onclick="kalcSetMode('std')" id="kalcTabStd" class="flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 cursor-pointer transition-all">Standard</button>
+        <button onclick="kalcSetMode('sci')" id="kalcTabSci" class="flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500 border border-slate-800 cursor-pointer transition-all hover:text-yellow-300">Saintifik</button>
+      </div>
+
+      <!-- Tombol Standard -->
+      <div id="kalcPadStd" class="grid grid-cols-4 gap-3 p-5">
+        <button onclick="kalcAksi('AC')"  class="kalc-fn col-span-2">AC</button>
+        <button onclick="kalcAksi('⌫')"   class="kalc-fn"><span class="material-icons-sharp text-xl">backspace</span></button>
+        <button onclick="kalcAksi('/')"   class="kalc-op">÷</button>
+
+        <button onclick="kalcAksi('7')"   class="kalc-num">7</button>
+        <button onclick="kalcAksi('8')"   class="kalc-num">8</button>
+        <button onclick="kalcAksi('9')"   class="kalc-num">9</button>
+        <button onclick="kalcAksi('*')"   class="kalc-op">×</button>
+
+        <button onclick="kalcAksi('4')"   class="kalc-num">4</button>
+        <button onclick="kalcAksi('5')"   class="kalc-num">5</button>
+        <button onclick="kalcAksi('6')"   class="kalc-num">6</button>
+        <button onclick="kalcAksi('-')"   class="kalc-op">−</button>
+
+        <button onclick="kalcAksi('1')"   class="kalc-num">1</button>
+        <button onclick="kalcAksi('2')"   class="kalc-num">2</button>
+        <button onclick="kalcAksi('3')"   class="kalc-num">3</button>
+        <button onclick="kalcAksi('+')"   class="kalc-op">+</button>
+
+        <button onclick="kalcAksi('+/-')" class="kalc-fn">+/−</button>
+        <button onclick="kalcAksi('0')"   class="kalc-num">0</button>
+        <button onclick="kalcAksi('.')"   class="kalc-num">.</button>
+        <button onclick="kalcAksi('=')"   class="kalc-eq">=</button>
+      </div>
+
+      <!-- Tombol Saintifik -->
+      <div id="kalcPadSci" class="hidden grid grid-cols-4 gap-3 p-5">
+        <button onclick="kalcAksi('AC')"    class="kalc-fn col-span-2">AC</button>
+        <button onclick="kalcAksi('⌫')"     class="kalc-fn"><span class="material-icons-sharp text-xl">backspace</span></button>
+        <button onclick="kalcAksi('/')"     class="kalc-op">÷</button>
+
+        <button onclick="kalcSci('sin')"    class="kalc-sci">sin</button>
+        <button onclick="kalcSci('cos')"    class="kalc-sci">cos</button>
+        <button onclick="kalcSci('tan')"    class="kalc-sci">tan</button>
+        <button onclick="kalcAksi('*')"     class="kalc-op">×</button>
+
+        <button onclick="kalcSci('sqrt')"   class="kalc-sci">√x</button>
+        <button onclick="kalcSci('pow2')"   class="kalc-sci">x²</button>
+        <button onclick="kalcSci('log')"    class="kalc-sci">log</button>
+        <button onclick="kalcAksi('-')"     class="kalc-op">−</button>
+
+        <button onclick="kalcSci('ln')"     class="kalc-sci">ln</button>
+        <button onclick="kalcSci('pi')"     class="kalc-sci">π</button>
+        <button onclick="kalcSci('pct')"    class="kalc-sci">%</button>
+        <button onclick="kalcAksi('+')"     class="kalc-op">+</button>
+
+        <button onclick="kalcAksi('7')"     class="kalc-num">7</button>
+        <button onclick="kalcAksi('8')"     class="kalc-num">8</button>
+        <button onclick="kalcAksi('9')"     class="kalc-num">9</button>
+        <button onclick="kalcAksi('=')"     class="kalc-eq row-span-2">=</button>
+
+        <button onclick="kalcAksi('4')"     class="kalc-num">4</button>
+        <button onclick="kalcAksi('5')"     class="kalc-num">5</button>
+        <button onclick="kalcAksi('6')"     class="kalc-num">6</button>
+
+        <button onclick="kalcAksi('1')"     class="kalc-num">1</button>
+        <button onclick="kalcAksi('2')"     class="kalc-num">2</button>
+        <button onclick="kalcAksi('3')"     class="kalc-num">3</button>
+        <button onclick="kalcAksi('+/-')"   class="kalc-fn">+/−</button>
+
+        <button onclick="kalcAksi('0')"     class="kalc-num col-span-2">0</button>
+        <button onclick="kalcAksi('.')"     class="kalc-num">.</button>
+        <button onclick="kalcSci('inv')"    class="kalc-sci">1/x</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== NILAI SUMATIF MODAL ===== -->
+  <div id="nilaiModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-indigo-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-sharp text-indigo-400 text-lg">bar_chart</span>
+          <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Rekap Nilai Sumatif</h3>
+        </div>
+        <button onclick="toggleNilaiModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+          <span class="material-icons-sharp block text-base">close</span>
+        </button>
+      </div>
+
+      <!-- Filter -->
+      <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-y border-indigo-500/10 bg-black/30 shrink-0">
+        <div class="relative flex-1 min-w-[140px]">
+          <select id="nilaiFilterKelas" onchange="loadNilaiSumatif()" class="w-full bg-slate-900 border border-indigo-500/20 hover:border-indigo-400 rounded-xl pl-4 pr-8 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 appearance-none cursor-pointer">
+            <option value="">-- Semua Kelas --</option>
+          </select>
+          <span class="material-icons-sharp absolute right-2 top-2 text-indigo-500/50 text-sm pointer-events-none">expand_more</span>
+        </div>
+        <div class="relative flex-1 min-w-[150px]">
+          <span class="material-icons-sharp absolute left-3 top-2 text-indigo-500/40 text-sm pointer-events-none">search</span>
+          <input type="text" id="nilaiSearch" oninput="filterNilaiLokal()" placeholder="Cari nama siswa..." class="w-full bg-slate-900 border border-indigo-500/20 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+        <button onclick="loadNilaiSumatif()" class="flex items-center gap-1.5 px-3 py-2 bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-400 text-indigo-300 text-xs font-bold rounded-xl cursor-pointer transition-all">
+          <span class="material-icons-sharp text-sm">refresh</span> Refresh
+        </button>
+        <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-400/70 bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 rounded-xl shrink-0">
+          <span class="material-icons-sharp text-sm">people</span>
+          <span id="nilaiJumlah">0</span> siswa
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="nilaiLoading" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-indigo-500/50">
+        <div class="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full mb-3"></div>
+        <p class="text-xs font-semibold">Memuat rekap nilai...</p>
+      </div>
+
+      <!-- Empty -->
+      <div id="nilaiEmpty" class="hidden flex-1 flex flex-col items-center justify-center py-16 text-indigo-500/30">
+        <span class="material-icons-sharp text-4xl mb-3">bar_chart</span>
+        <p class="text-xs font-bold">Belum ada data nilai</p>
+        <p class="text-[10px] text-slate-500 mt-1">Pilih kelas terlebih dahulu</p>
+      </div>
+
+      <!-- Tabel -->
+      <div class="flex-1 overflow-auto p-4">
+        <table class="w-full text-xs border-collapse min-w-[500px]">
+          <thead class="sticky top-0 z-10">
+            <tr class="bg-slate-900 text-[10px] font-black uppercase tracking-widest">
+              <th class="px-3 py-3 text-left border-b border-indigo-500/20 text-indigo-400/80">Nama Siswa</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-blue-400/80 w-[70px]">Kelas</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-emerald-400 w-[80px]">Sumatif 1</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-yellow-400 w-[80px]">Sumatif 2</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-orange-400 w-[80px]">Sumatif 3</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-purple-400 w-[90px]">Rata-rata</th>
+            </tr>
+          </thead>
+          <tbody id="nilaiTbody" class="divide-y divide-indigo-500/10"></tbody>
+        </table>
+      </div>
+
+      <!-- Footer stats -->
+      <div id="nilaiStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 py-4 border-t border-indigo-500/10 bg-black/30">
+        <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
+          <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Rata S1</p>
+          <p id="nilaiStatS1" class="text-xl font-extrabold text-emerald-300">-</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-yellow-500/10 text-center">
+          <p class="text-[10px] font-bold text-yellow-400/60 uppercase tracking-widest mb-1">Rata S2</p>
+          <p id="nilaiStatS2" class="text-xl font-extrabold text-yellow-300">-</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-orange-500/10 text-center">
+          <p class="text-[10px] font-bold text-orange-400/60 uppercase tracking-widest mb-1">Rata S3</p>
+          <p id="nilaiStatS3" class="text-xl font-extrabold text-orange-300">-</p>
+        </div>
+        <div class="bg-black/40 rounded-xl p-3 border border-purple-500/10 text-center">
+          <p class="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest mb-1">Rata Semua</p>
+          <p id="nilaiStatAll" class="text-xl font-extrabold text-purple-300">-</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SUCCESS POPUP ===== -->
+  <div id="successPopup" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] flex items-center justify-center hidden">
+    <canvas id="konfettiCanvas" class="fixed inset-0 pointer-events-none z-[59]" style="width:100%;height:100%"></canvas>
+    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-emerald-500/30 max-w-sm w-full p-7 m-4 relative text-center flex flex-col items-center gap-5">
+
+      <!-- Ikon centang animasi -->
+      <div class="relative flex items-center justify-center">
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-600 to-teal-500 flex items-center justify-center shadow-xl shadow-emerald-500/30" id="successIcon">
+          <span class="material-icons-sharp text-white text-4xl">cloud_done</span>
+        </div>
+        <div class="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping"></div>
+      </div>
+
+      <!-- Teks utama -->
+      <div>
+        <p class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">Tersimpan ke Cloud</p>
+        <h2 class="text-lg font-extrabold text-white leading-tight" id="successTitle">Data Berhasil Disimpan!</h2>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed" id="successMessage"></p>
+      </div>
+
+      <!-- Ringkasan data -->
+      <div class="w-full bg-black/40 rounded-2xl border border-emerald-500/10 p-4 space-y-2.5 text-left" id="successSummary"></div>
+
+      <!-- Waktu simpan -->
+      <p class="text-[10px] font-bold text-slate-600" id="successTime"></p>
+
+      <!-- Tombol tutup -->
+      <button onclick="tutupSuccessPopup()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-black text-sm py-3.5 rounded-2xl shadow-lg cursor-pointer active:scale-[0.98] transition-all hover:shadow-emerald-500/30 hover:shadow-xl">
+        Lanjutkan
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    //  KONFIGURASI GITHUB PAGES
+    //  Ganti nilai GAS_URL di bawah ini dengan URL Web App GAS Anda
+    //  Cara deploy: GAS Editor → Deploy → New deployment → Web App
+    //               Execute as: Me | Who has access: Anyone
+    // ============================================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzZSOOD3126dukNYLR4Po05c5F9V4lSLC-Xfk7FB7R0yOZV8ZBizMpd-Bg6M5j_uzPM/exec';
+
+    // Helper: memanggil fungsi GAS via fetch (pengganti google.script.run)
+    // Mengembalikan Promise
+    function gasCall(funcName, ...args) {
+      const url = new URL(GAS_URL);
+      url.searchParams.set('func', funcName);
+      if (args.length > 0) {
+        url.searchParams.set('args', JSON.stringify(args));
+      }
+      return fetch(url.toString())
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(json) {
+          if (json.error) throw new Error(json.error);
+          return json.result;
+        });
+    }
+
+    // Shim google.script.run agar kode lama tetap berfungsi tanpa diubah
+    // Pola: google.script.run.withSuccessHandler(fn).withFailureHandler(fn).namaFungsi(arg)
+    const google = {
+      script: {
+        run: new Proxy({}, {
+          get: function(target, prop) {
+            // Jika dipanggil langsung sebagai fungsi: google.script.run.namaFungsi(arg)
+            if (prop === 'withSuccessHandler') {
+              return function(successFn) {
+                return new Proxy({}, {
+                  get: function(t2, p2) {
+                    if (p2 === 'withFailureHandler') {
+                      return function(failFn) {
+                        return new Proxy({}, {
+                          get: function(t3, p3) {
+                            return function(...args) {
+                              gasCall(p3, ...args).then(successFn).catch(failFn || console.error);
+                            };
+                          }
+                        });
+                      };
+                    }
+                    // withSuccessHandler().namaFungsi(arg)
+                    return function(...args) {
+                      gasCall(p2, ...args).then(successFn).catch(console.error);
+                    };
+                  }
+                });
+              };
+            }
+            if (prop === 'withFailureHandler') {
+              return function(failFn) {
+                return new Proxy({}, {
+                  get: function(t2, p2) {
+                    if (p2 === 'withSuccessHandler') {
+                      return function(successFn) {
+                        return new Proxy({}, {
+                          get: function(t3, p3) {
+                            return function(...args) {
+                              gasCall(p3, ...args).then(successFn).catch(failFn || console.error);
+                            };
+                          }
+                        });
+                      };
+                    }
+                    return function(...args) {
+                      gasCall(p2, ...args).then(() => {}).catch(failFn || console.error);
+                    };
+                  }
+                });
+              };
+            }
+            // Dipanggil langsung tanpa handler
+            return function(...args) {
+              gasCall(prop, ...args).catch(console.error);
+            };
+          }
+        })
+      }
+    };
+
+    let listNamaSiswaGlobal = []; 
+    let currentTab = 'presensi'; 
+    let timerInterval; let timerSisaWaktu = 300; let timerBerjalan = false;
+    let localAbsenState = {}; let localNilaiState = {}; let localJNState = {};
+    let kelasAktifSebelumnya = ''; // [FIX BUG 2] Untuk rollback dropdown jika ganti kelas dibatalkan
+    let jurnalPanelOpen = false;
+
+    function toggleJurnalPanel() {
+      let body = document.getElementById('jurnalPanelBody');
+      let icon = document.getElementById('jurnalPanelIcon');
+      jurnalPanelOpen = !jurnalPanelOpen;
+      if (jurnalPanelOpen) {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        body.style.opacity   = '1';
+        body.style.paddingTop    = '';
+        body.style.paddingBottom = '';
+        icon.style.transform = 'rotate(0deg)';
+        setTimeout(() => { body.style.maxHeight = 'none'; }, 310);
+      } else {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          body.style.maxHeight    = '0';
+          body.style.opacity      = '0';
+          body.style.paddingTop   = '0';
+          body.style.paddingBottom= '0';
+        });
+        icon.style.transform = 'rotate(180deg)';
+      }
+      body.style.overflow = 'hidden';
+      body.style.transition = 'max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease';
+    }
+
+    const colorMap = {
+      'H': 'peer-checked:bg-emerald-600 peer-checked:text-white',
+      'S': 'peer-checked:bg-orange-500 peer-checked:text-white',
+      'I': 'peer-checked:bg-sky-500 peer-checked:text-white',
+      'A': 'peer-checked:bg-red-600 peer-checked:text-white',
+      'B': 'peer-checked:bg-orange-500 peer-checked:text-white'
+    };
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      let bgClass = 'bg-slate-900 border-emerald-500/40 text-emerald-300';
+      let icon = 'check_circle';
+      if (type === 'error')   { bgClass = 'bg-slate-900 border-rose-500/40 text-rose-300'; icon = 'error_outline'; }
+      else if (type === 'warning') { bgClass = 'bg-slate-900 border-purple-500/40 text-purple-300'; icon = 'warning_amber'; }
+      toast.className = `toast-enter flex items-center gap-3 p-4 border rounded-2xl shadow-2xl backdrop-blur-md bg-opacity-95 ${bgClass}`;
+      toast.innerHTML = `<span class="material-icons-sharp text-lg">${icon}</span><div class="text-xs font-bold tracking-wide flex-1">${message}</div>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 310);
+      }, 3800);
+    }
+
+    window.onload = function() {
+      google.script.run.withSuccessHandler(function(arrKelas) {
+        let select = document.getElementById('dropdownKelas');
+        select.innerHTML = '<option value="">-- Tentukan Kelas --</option>';
+        arrKelas.forEach(function(kls) {
+          let opt = document.createElement('option'); opt.value = kls; opt.innerHTML = kls; select.appendChild(opt);
+        });
+        showToast("Koneksi database Presenly terhubung.", "success");
+        setTimeout(autoCheckInbox, 1500);
+        initJNGlobal();
+      }).getDaftarKelas();
+
+      // Auto fullscreen saat halaman dibuka
+      autoFullscreen();
+    };
+
+    function autoFullscreen() {
+      // Hanya aktif di perangkat mobile / layar kecil
+      let isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      if (!isMobile) return;
+
+      let el = document.documentElement;
+      let req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+      if (req) {
+        req.call(el).catch(function() {
+          tampilTombolFullscreen();
+        });
+      } else {
+        tampilTombolFullscreen();
+      }
+    }
+
+    function tampilTombolFullscreen() {
+      // Tambahkan banner sekali klik untuk masuk fullscreen
+      let banner = document.createElement('div');
+      banner.id = 'fsPromptBanner';
+      banner.className = 'fixed top-0 left-0 right-0 z-[70] flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-purple-900/95 to-red-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-xl cursor-pointer';
+      banner.innerHTML = `
+        <div class="flex items-center gap-2 text-xs font-bold text-white">
+          <span class="material-icons-sharp text-yellow-400 text-base">fullscreen</span>
+          Ketuk untuk layar penuh
+        </div>
+        <button onclick="document.getElementById('fsPromptBanner').remove()" class="text-white/50 hover:text-white p-1 rounded-lg">
+          <span class="material-icons-sharp text-sm">close</span>
+        </button>
+      `;
+      banner.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return;
+        autoFullscreen();
+        banner.remove();
+      });
+      document.body.prepend(banner);
+    }
+
+    // SOLUSI UTAMA BUG CRASH: Ambil paksa data DOM sebelum beralih komponen visual halaman
+    function switchTab(tabTarget) {
+      if (currentTab === tabTarget) return;
+      simpanStateKeMemory(); 
+      currentTab = tabTarget;
+      
+      let btnPresensi = document.getElementById('tabBtnPresensi');
+      let btnPenilaian = document.getElementById('tabBtnPenilaian');
+      let thAksi = document.getElementById('thAksi');
+      let btnTextSimpan = document.getElementById('btnTextSimpan');
+
+      if (currentTab === 'presensi') {
+        btnPresensi.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black";
+        btnPenilaian.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200";
+        if(thAksi) thAksi.innerText = "Status Presensi";
+        btnTextSimpan.innerText = "Simpan Rekap Presensi";
+      } else {
+        btnPenilaian.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black";
+        btnPresensi.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200";
+        if(thAksi) thAksi.innerText = "Nilai & JN";
+        btnTextSimpan.innerText = "Simpan Rekap Penilaian";
+      }
+      renderTabelSiswa();
+      showToast(`Beralih ke halaman ${currentTab}.`, "warning");
+    }
+
+    function loadSiswa() {
+      let kelas = document.getElementById('dropdownKelas').value;
+      let container = document.getElementById('tabelContainer');
+      let placeholder = document.getElementById('placeholderSiswa');
+      let loading = document.getElementById('loadingSiswa');
+      
+      if(!kelas) { container.classList.add('hidden'); placeholder.classList.remove('hidden'); return; }
+
+      // [FIX BUG 2] Konfirmasi dulu jika ada catatan/materi yang belum tersimpan,
+      // agar guru tidak kehilangan data saat tidak sengaja ganti kelas.
+      let materiAda = document.getElementById('materi').value.trim();
+      let catatanAda = document.getElementById('catatan').value.trim();
+      if ((materiAda || catatanAda) && listNamaSiswaGlobal.length > 0) {
+        if (!confirm('Mengganti kelas akan menghapus materi dan catatan yang belum disimpan.\n\nLanjutkan ganti kelas?')) {
+          // Kembalikan dropdown ke kelas yang aktif sebelumnya
+          document.getElementById('dropdownKelas').value = kelasAktifSebelumnya;
+          return;
+        }
+      }
+
+      // Catat kelas aktif sekarang sebelum proses ganti
+      kelasAktifSebelumnya = kelas;
+
+      placeholder.classList.add('hidden'); loading.classList.remove('hidden'); container.classList.add('hidden');
+
+      // Bersihkan form hanya jika guru sengaja mengganti pilihan ruang kelas baru
+      document.getElementById('materi').value = '';
+      document.getElementById('jp').value = '2';
+      // JN global tidak direset — tetap pakai nilai terakhir
+      document.getElementById('catatan').value = '';
+      document.getElementById('keterangan').value = '';
+
+      google.script.run.withSuccessHandler(function(siswa) {
+        listNamaSiswaGlobal = siswa;
+        localAbsenState = {}; localNilaiState = {}; localJNState = {};
+        // Pakai JN terakhir sebagai default untuk semua siswa baru dimuat
+        let savedJN = 1;
+        try { savedJN = parseInt(localStorage.getItem('presenly_jn_global')) || 1; } catch(e) {}
+        siswa.forEach((_, index) => {
+          localAbsenState[index] = 'H';
+          localNilaiState[index] = 80;
+          localJNState[index]    = savedJN;
+        });
+        loading.classList.add('hidden'); container.classList.remove('hidden');
+        document.getElementById('jumlahSiswa').innerText = siswa.length;
+        renderTabelSiswa();
+        showToast(`Berhasil memuat ${siswa.length} siswa ${kelas}.`, "success");
+      }).getSiswaByKelas(kelas);
+    }
+
+    function renderTabelSiswa() {
+      let masterList = document.getElementById('listSiswaMaster');
+      masterList.innerHTML = '';
+
+      if(listNamaSiswaGlobal.length === 0) {
+        masterList.innerHTML = `<div class="p-6 text-center text-xs text-purple-400/40">Daftar siswa kosong.</div>`;
+        return;
+      }
+
+      listNamaSiswaGlobal.forEach(function(siswaObj, index) {
+        let currentStatus = localAbsenState[index] || 'H';
+        let currentNilai  = localNilaiState[index] !== undefined ? localNilaiState[index] : 80;
+        let currentJN     = localJNState[index] !== undefined ? localJNState[index] : 1;
+
+        let rowElement = document.createElement('div');
+        rowElement.className = "sm:grid grid-cols-12 items-center p-4 sm:py-4 divide-y divide-purple-500/5 sm:divide-y-0 bg-slate-950/20 sm:bg-transparent border border-purple-500/10 sm:border-none rounded-xl sm:rounded-none space-y-3 sm:space-y-0";
+        
+        let aksiContainerHtml = currentTab === 'presensi' ? `
+          <div class="flex justify-center items-center p-1 bg-black rounded-xl w-full max-w-sm mx-auto border border-purple-500/20 mt-2 sm:mt-0 shadow-inner">
+            ${['H','S','I','A','B'].map(st => `
+              <label class="cursor-pointer flex-1 text-center select-none">
+                <input type="radio" name="master_absen_${index}" value="${st}" ${st === currentStatus ? 'checked' : ''} onchange="updateAbsenArray(${index}, '${st}')" class="sr-only peer">
+                <div class="text-xs sm:text-sm font-black py-2.5 rounded-lg text-slate-400 transition-all duration-150 hover:text-blue-200 ${colorMap[st]}">${st}</div>
+              </label>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="flex items-center justify-between sm:justify-center gap-2 pt-2 sm:pt-0">
+            <span class="text-xs font-bold text-purple-400/50 block sm:hidden">Input Nilai:</span>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
+                <input type="number" id="input_nilai_${index}" value="${currentNilai}" onclick="this.select()" oninput="updateNilaiArray(${index}, this.value)" class="w-20 text-center font-black bg-black border-2 border-purple-500/30 focus:border-blue-400 rounded-xl py-2 text-base text-blue-300 focus:outline-none transition-all">
+                <span class="text-xs font-bold text-blue-400/40">Poin</span>
+              </div>
+              <div class="flex flex-col items-center gap-0.5 shrink-0">
+                <span class="text-[9px] font-black text-yellow-400/70 uppercase tracking-widest">JN</span>
+                <select id="jn_${index}" onchange="updateJNArray(${index}, this.value)"
+                  class="bg-black border border-yellow-500/30 hover:border-yellow-400 text-yellow-300 font-black text-xs rounded-xl px-2 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-500 cursor-pointer appearance-none text-center w-12">
+                  <option value="1" ${currentJN==1?'selected':''}>1</option>
+                  <option value="2" ${currentJN==2?'selected':''}>2</option>
+                  <option value="3" ${currentJN==3?'selected':''}>3</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+
+        rowElement.innerHTML = `
+          <div class="col-span-5 pb-1 sm:pb-0">
+            <div class="text-sm sm:text-lg font-bold text-slate-100/90 tracking-wide">${siswaObj.nama}</div>
+            <div class="text-xs text-purple-400/40 font-bold mt-1 tracking-wider">NIS: ${siswaObj.nis}</div>
+          </div>
+          <div class="col-span-7">
+            ${aksiContainerHtml}
+          </div>
+        `;
+        masterList.appendChild(rowElement);
+      });
+    }
+
+    // Fungsi pembaruan array realtime agar tidak Null Pointer saat element DOM dihancurkan tab switcher
+    function updateAbsenState(index, val) { localAbsenState[index] = val; }
+    function updateAbsenArray(index, val) { updateAbsenState(index, val); }
+    function updateNilaiArray(index, val) { localNilaiState[index] = parseInt(val) || 0; }
+    function updateJNArray(index, val)    { localJNState[index] = parseInt(val) || 1; }
+
+    function terapkanJNGlobal(val) {
+      let jn = parseInt(val) || 1;
+      listNamaSiswaGlobal.forEach(function(_, index) {
+        localJNState[index] = jn;
+        let el = document.getElementById('jn_' + index);
+        if (el) el.value = jn;
+      });
+      // Simpan JN terakhir agar bertahan saat ganti kelas
+      try { localStorage.setItem('presenly_jn_global', jn); } catch(e) {}
+      showToast('Sumatif ' + jn + ' diterapkan ke semua siswa.', 'success');
+    }
+
+    function initJNGlobal() {
+      try {
+        let saved = localStorage.getItem('presenly_jn_global');
+        if (saved && ['1','2','3'].includes(saved)) {
+          document.getElementById('jnGlobal').value = saved;
+        }
+      } catch(e) {}
+    }
+
+    function simpanStateKeMemory() {
+      listNamaSiswaGlobal.forEach(function(_, index) {
+        if (currentTab === 'presensi') {
+          let radio = document.querySelector(`input[name="master_absen_${index}"]:checked`);
+          if (radio) localAbsenState[index] = radio.value;
+        } else {
+          let inp = document.getElementById(`input_nilai_${index}`);
+          if (inp) localNilaiState[index] = parseInt(inp.value) || 0;
+          let jnEl = document.getElementById(`jn_${index}`);
+          if (jnEl) localJNState[index] = parseInt(jnEl.value) || 1;
+        }
+      });
+    }
+
+    function simpanKeDatabase() {
+      let kelas = document.getElementById('dropdownKelas').value;
+      let materi     = document.getElementById('materi').value;
+      let catatan    = document.getElementById('catatan').value;
+      let jp         = parseInt(document.getElementById('jp').value) || 2;
+      let keterangan = document.getElementById('keterangan').value;
+      let jnGlobal   = parseInt(document.getElementById('jnGlobal').value) || 1;
+
+      // Sinkronkan localJNState dengan jnGlobal untuk siswa yang belum diubah manual
+      if (currentTab === 'penilaian') {
+        listNamaSiswaGlobal.forEach(function(_, index) {
+          if (localJNState[index] === undefined) localJNState[index] = jnGlobal;
+        });
+      }
+      let btn = document.getElementById('btnSimpan');
+
+      if(!kelas) { showToast("Gagal menyimpan, ruang kelas belum ditentukan!", "error"); return; }
+      simpanStateKeMemory(); 
+
+      // [FIX BUG 1] Jangan pakai btn.innerHTML — itu menghapus elemen #btnTextSimpan dari DOM
+      // sehingga script crash saat mencoba mengaksesnya kembali setelah simpan selesai.
+      // Gunakan innerText pada span yang sudah ada agar elemen tetap utuh di DOM.
+      btn.disabled = true;
+      document.getElementById('btnTextSimpan').innerText = 'Menyimpan...';
+      showToast("Memulai sinkronisasi data ke cloud...", "warning");
+
+      let dataSiswaFinal = [];
+      listNamaSiswaGlobal.forEach(function(siswaObj, index) {
+        dataSiswaFinal.push({
+          nis   : siswaObj.nis, 
+          nama  : siswaObj.nama, 
+          status: localAbsenState[index] || 'H',
+          nilai : localNilaiState[index] !== undefined ? localNilaiState[index] : 80,
+          jn    : currentTab === 'penilaian' ? (localJNState[index] || 1) : ''
+        });
+      });
+
+      let payload = { tipe: currentTab, kelas: kelas, materi: materi, catatan: catatan, jp: jp, keterangan: keterangan, siswa: dataSiswaFinal };
+
+      google.script.run.withSuccessHandler(function(res) {
+        btn.disabled = false;
+        document.getElementById('btnTextSimpan').innerText = currentTab === 'presensi' ? "Simpan Rekap Presensi" : "Simpan Rekap Penilaian";
+        renderTabelSiswa();
+        tampilSuccessPopup(payload, res);
+      }).withFailureHandler(function(err) {
+        showToast("Gagal menyimpan: " + err.message, "error");
+        btn.disabled = false;
+        document.getElementById('btnTextSimpan').innerText = currentTab === 'presensi' ? "Simpan Rekap Presensi" : "Simpan Rekap Penilaian";
+      }).simpanData(payload);
+    }
+
+    // ================= SUCCESS POPUP =================
+    function tampilSuccessPopup(payload, serverMsg) {
+      let isPresensi = payload.tipe === 'presensi';
+      let jumlahSiswa = payload.siswa.length;
+
+      // Hitung ringkasan
+      let ringkasan = {};
+      if (isPresensi) {
+        payload.siswa.forEach(s => { ringkasan[s.status] = (ringkasan[s.status] || 0) + 1; });
+      } else {
+        let vals = payload.siswa.map(s => parseFloat(s.nilai || 0));
+        ringkasan.rata  = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+        ringkasan.min   = Math.min(...vals);
+        ringkasan.max   = Math.max(...vals);
+        ringkasan.total = jumlahSiswa;
+      }
+
+      // Judul & pesan
+      document.getElementById('successTitle').innerText = isPresensi
+        ? 'Rekap Presensi Tersimpan!' : 'Rekap Penilaian Tersimpan!';
+      document.getElementById('successMessage').innerText = serverMsg || 'Data berhasil disinkronisasi ke Google Sheets.';
+
+      // Ringkasan detail
+      let sumEl = document.getElementById('successSummary');
+      sumEl.innerHTML = '';
+
+      let rows = [
+        { icon: 'class',         label: 'Kelas',    val: payload.kelas,                         color: 'text-blue-300' },
+        { icon: 'menu_book',     label: 'Materi',   val: payload.materi || '-',                 color: 'text-purple-300' },
+        { icon: 'schedule',      label: 'JP',       val: (payload.jp || 2) + ' Jam Pelajaran',  color: 'text-yellow-300' },
+        { icon: 'group',         label: 'Siswa',    val: jumlahSiswa + ' orang',                color: 'text-emerald-300' },
+      ];
+
+      if (isPresensi) {
+        let statusMap = {H:'Hadir',S:'Sakit',I:'Izin',A:'Alpha',B:'Bolos'};
+        let statusColor = {H:'text-emerald-300',S:'text-yellow-300',I:'text-sky-300',A:'text-red-300',B:'text-orange-300'};
+        Object.entries(ringkasan).forEach(([k,v]) => {
+          rows.push({ icon:'person', label: statusMap[k]||k, val: v + ' siswa', color: statusColor[k]||'text-slate-300' });
+        });
+      } else {
+        rows.push(
+          { icon:'leaderboard', label:'Rata-rata', val: ringkasan.rata,         color:'text-emerald-300' },
+          { icon:'arrow_upward', label:'Tertinggi', val: String(ringkasan.max),  color:'text-blue-300' },
+          { icon:'arrow_downward', label:'Terendah', val: String(ringkasan.min), color:'text-red-300' }
+        );
+      }
+
+      rows.forEach(r => {
+        let div = document.createElement('div');
+        div.className = 'flex items-center justify-between text-xs';
+        div.innerHTML = `
+          <span class="flex items-center gap-1.5 text-slate-500 font-bold">
+            <span class="material-icons-sharp text-sm">${r.icon}</span>${r.label}
+          </span>
+          <span class="font-extrabold ${r.color}">${r.val}</span>
+        `;
+        sumEl.appendChild(div);
+      });
+
+      // Waktu simpan
+      let now = new Date();
+      document.getElementById('successTime').innerText =
+        'Disimpan pada ' + now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
+        ' · ' + now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+
+      // Tampilkan popup + lock scroll
+      let popup = document.getElementById('successPopup');
+      popup.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      // Jalankan konfetti
+      jalankanKonfetti();
+    }
+
+    function tutupSuccessPopup() {
+      document.getElementById('successPopup').classList.add('hidden');
+      document.body.style.overflow = '';
+      // Stop konfetti
+      let canvas = document.getElementById('konfettiCanvas');
+      let ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (window._konfettiAF) { cancelAnimationFrame(window._konfettiAF); window._konfettiAF = null; }
+    }
+
+    // ── Konfetti ringan (canvas, tanpa library) ─────────────
+    function jalankanKonfetti() {
+      let canvas = document.getElementById('konfettiCanvas');
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let ctx = canvas.getContext('2d');
+      let colors = ['#10b981','#6366f1','#ef4444','#f59e0b','#3b82f6','#8b5cf6','#ec4899'];
+      let pieces = Array.from({length: 90}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height * 0.5,
+        w: 7 + Math.random() * 7,
+        h: 3 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: 2 + Math.random() * 3.5,
+        angle: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.18,
+        opacity: 0.85 + Math.random() * 0.15,
+        life: 1
+      }));
+
+      let start = null;
+      const DURATION = 3200;
+
+      function draw(ts) {
+        if (!start) start = ts;
+        let elapsed = ts - start;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        pieces.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+          p.vy += 0.07; // gravity
+          if (elapsed > DURATION * 0.6) p.opacity -= 0.012;
+          if (p.opacity <= 0 || p.y > canvas.height + 20) return;
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        });
+        if (alive && elapsed < DURATION + 1000) {
+          window._konfettiAF = requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          window._konfettiAF = null;
+        }
+      }
+      if (window._konfettiAF) cancelAnimationFrame(window._konfettiAF);
+      window._konfettiAF = requestAnimationFrame(draw);
+    }
+
+    // ================= INBOX TUGAS =================
+    let inboxDataGlobal = [];
+
+    function toggleInboxModal() {
+      let modal = document.getElementById('inboxModal');
+      let isHiding = !modal.classList.contains('hidden');
+      modal.classList.toggle('hidden');
+      document.body.style.overflow = isHiding ? '' : 'hidden';
+      if (!isHiding) {
+        // Tandai semua tugas yang ada sekarang sebagai "sudah dibaca"
+        simpanInboxSudahDibaca();
+        // Sembunyikan badge
+        let badge = document.getElementById('inboxBadge');
+        badge.classList.add('hidden');
+        loadInbox();
+      }
+    }
+
+    // ── Helpers read-tracking via localStorage ──────────────
+    function getInboxSudahDibaca() {
+      try { return JSON.parse(localStorage.getItem('presenly_inbox_read') || '[]'); }
+      catch(e) { return []; }
+    }
+
+    function simpanInboxSudahDibaca() {
+      // Simpan key unik setiap tugas: timestamp+nama+judul
+      let keys = inboxDataGlobal.map(r => inboxKey(r));
+      try { localStorage.setItem('presenly_inbox_read', JSON.stringify(keys)); }
+      catch(e) {}
+    }
+
+    function inboxKey(r) {
+      return (r.timestamp || '') + '|' + (r.nama || '') + '|' + (r.judul || '');
+    }
+
+    function hitungInboxBaru(data) {
+      let sudahDibaca = getInboxSudahDibaca();
+      return data.filter(r => !sudahDibaca.includes(inboxKey(r))).length;
+    }
+
+    function updateInboxBadge(data) {
+      let badge = document.getElementById('inboxBadge');
+      let jumlahBaru = hitungInboxBaru(data);
+      if (jumlahBaru > 0) {
+        badge.classList.remove('hidden');
+        badge.innerText = jumlahBaru > 99 ? '99+' : jumlahBaru;
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function loadInbox() {
+      let loading = document.getElementById('inboxLoading');
+      let empty   = document.getElementById('inboxEmpty');
+      let stats   = document.getElementById('inboxStats');
+      let tbody   = document.getElementById('inboxTbody');
+      tbody.innerHTML = ''; empty.classList.add('hidden'); stats.classList.add('hidden');
+      loading.classList.remove('hidden');
+      document.getElementById('inboxJumlah').innerText = '0';
+
+      google.script.run
+        .withSuccessHandler(function(data) {
+          loading.classList.add('hidden');
+          inboxDataGlobal = data || [];
+          // Isi dropdown kelas unik
+          let kelasList = [...new Set(inboxDataGlobal.map(r => r.kelas).filter(Boolean))].sort();
+          let sel = document.getElementById('inboxFilterKelas');
+          let prev = sel.value;
+          sel.innerHTML = '<option value="">-- Semua Kelas --</option>';
+          kelasList.forEach(k => {
+            let o = document.createElement('option');
+            o.value = k; o.innerText = k;
+            if (k === prev) o.selected = true;
+            sel.appendChild(o);
+          });
+          filterInboxLokal();
+        })
+        .withFailureHandler(function(err) {
+          loading.classList.add('hidden');
+          showToast('Gagal memuat inbox: ' + err.message, 'error');
+          document.getElementById('inboxEmpty').classList.remove('hidden');
+        })
+        .getInboxTugas();
+    }
+
+    function filterInboxLokal() {
+      let kelas = document.getElementById('inboxFilterKelas').value.toLowerCase();
+      let mode  = document.getElementById('inboxFilterMode').value.toLowerCase();
+      let cari  = document.getElementById('inboxSearch').value.toLowerCase();
+      let hasil = inboxDataGlobal.filter(function(r) {
+        let cocokKelas = !kelas || (r.kelas||'').toLowerCase() === kelas;
+        let cocokMode  = !mode  || (r.mode||'').toLowerCase().includes(mode);
+        let cocokCari  = !cari  || (r.nama||'').toLowerCase().includes(cari)
+                                || (r.judul||'').toLowerCase().includes(cari)
+                                || (r.catatan||'').toLowerCase().includes(cari);
+        return cocokKelas && cocokMode && cocokCari;
+      });
+      renderInbox(hasil);
+    }
+
+    function renderInbox(data) {
+      let tbody = document.getElementById('inboxTbody');
+      let empty = document.getElementById('inboxEmpty');
+      let stats = document.getElementById('inboxStats');
+      tbody.innerHTML = '';
+      document.getElementById('inboxJumlah').innerText = data.length;
+      document.getElementById('inboxTotalBadge').innerText = data.length + ' tugas';
+      document.getElementById('inboxTotalBadge').classList.remove('hidden');
+
+      if (data.length === 0) { empty.classList.remove('hidden'); stats.classList.add('hidden'); return; }
+      empty.classList.add('hidden'); stats.classList.remove('hidden');
+
+      // Hitung statistik
+      let today = new Date().toLocaleDateString('id-ID');
+      let hariIni = data.filter(r => {
+        try { return new Date(r.timestamp).toLocaleDateString('id-ID') === today; } catch(e) { return false; }
+      }).length;
+      let kelasUnik = new Set(data.map(r => r.kelas).filter(Boolean)).size;
+      let modeFile  = data.filter(r => (r.mode||'').toLowerCase() === 'file').length;
+      document.getElementById('inboxStatTotal').innerText   = data.length;
+      document.getElementById('inboxStatHariIni').innerText = hariIni;
+      document.getElementById('inboxStatKelas').innerText   = kelasUnik;
+      document.getElementById('inboxStatFile').innerText    = modeFile;
+
+      let sudahDibaca = getInboxSudahDibaca();
+
+      data.forEach(function(r, i) {
+        let isNew   = !sudahDibaca.includes(inboxKey(r));
+        let rowBg   = isNew ? 'bg-orange-500/5 border-l-2 border-l-orange-400/60' : (i % 2 === 0 ? 'bg-black/20' : 'bg-black/40');
+
+        // Format timestamp
+        let tglStr = '-';
+        try {
+          let d = new Date(r.timestamp);
+          tglStr = d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'2-digit'})
+                 + ' ' + d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+        } catch(e) { tglStr = r.timestamp || '-'; }
+
+        // Mode badge
+        let modeLower = (r.mode||'').toLowerCase();
+        let modeBadge = modeLower === 'file'
+          ? '<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/20">File</span>'
+          : modeLower === 'link'
+          ? '<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">Link</span>'
+          : '<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/20">' + (r.mode||'-') + '</span>';
+
+        // Tombol aksi
+        let linkUrl = r.linkFile || r.linkTugas || '';
+        let aksiBtns = linkUrl
+          ? `<div class="flex gap-1 justify-center">
+               <a href="${linkUrl}" target="_blank" class="flex items-center gap-0.5 px-2 py-1 bg-orange-500/20 hover:bg-orange-500/40 border border-orange-500/30 text-orange-300 font-bold rounded-lg cursor-pointer transition-all text-[10px]">
+                 <span class="material-icons-sharp text-xs">open_in_new</span> Buka
+               </a>
+             </div>`
+          : '<span class="text-slate-600 text-[10px]">—</span>';
+
+        // Indikator baru
+        let newDot = isNew
+          ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-orange-400 mr-1 align-middle"></span>'
+          : '';
+
+        let tr = document.createElement('tr');
+        tr.className = rowBg + ' hover:bg-orange-500/5 transition-colors';
+        tr.innerHTML = `
+          <td class="px-3 py-3 text-slate-400 whitespace-nowrap font-mono text-[10px]">${tglStr}</td>
+          <td class="px-3 py-3 font-bold text-slate-100">${newDot}${r.nama || '-'}</td>
+          <td class="px-3 py-3 text-center text-orange-300 font-extrabold">${r.no || '-'}</td>
+          <td class="px-3 py-3 text-center">
+            <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/20">${r.kelas || '-'}</span>
+          </td>
+          <td class="px-3 py-3 text-slate-200 max-w-[180px] font-semibold" title="${r.judul||''}">${r.judul || '-'}</td>
+          <td class="px-3 py-3 text-slate-400 max-w-[150px] italic text-[10px]" title="${r.catatan||''}">${r.catatan ? r.catatan.substring(0,60)+(r.catatan.length>60?'…':'') : '—'}</td>
+          <td class="px-3 py-3 text-center">${modeBadge}</td>
+          <td class="px-3 py-3 text-center">${aksiBtns}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Auto-load inbox badge saat halaman siap
+    function autoCheckInbox() {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          inboxDataGlobal = data || [];
+          updateInboxBadge(inboxDataGlobal);
+        })
+        .withFailureHandler(function() {})
+        .getInboxTugas();
+    }
+
+    // ── Rekap Hadir (sheet hadir) ────────────────────────────
+    let rekapHadirGlobal = [];
+
+    function loadRekapHadir() {
+      let kelas   = document.getElementById('hadirFilterKelas').value;
+      let loading = document.getElementById('hadirLoading');
+      let empty   = document.getElementById('hadirEmpty');
+      let stats   = document.getElementById('hadirStats');
+      let tbody   = document.getElementById('hadirTbody');
+      tbody.innerHTML = ''; empty.classList.add('hidden'); stats.classList.add('hidden');
+      loading.classList.remove('hidden');
+      document.getElementById('hadirJumlah').innerText = '0';
+
+      google.script.run
+        .withSuccessHandler(function(data) {
+          loading.classList.add('hidden');
+          rekapHadirGlobal = data || [];
+          filterRekapHadirLokal();
+        })
+        .withFailureHandler(function(err) {
+          loading.classList.add('hidden');
+          showToast('Gagal memuat rekap hadir: ' + err.message, 'error');
+          empty.classList.remove('hidden');
+        })
+        .getRekapHadir(kelas);
+    }
+
+    function filterRekapHadirLokal() {
+      let cari = document.getElementById('hadirSearch').value.toLowerCase();
+      let hasil = rekapHadirGlobal.filter(r =>
+        !cari || (r.nama||'').toLowerCase().includes(cari)
+      );
+      renderRekapHadir(hasil);
+    }
+
+    function renderRekapHadir(data) {
+      let tbody = document.getElementById('hadirTbody');
+      let empty = document.getElementById('hadirEmpty');
+      let stats = document.getElementById('hadirStats');
+      tbody.innerHTML = '';
+      document.getElementById('hadirJumlah').innerText = data.length;
+
+      if (data.length === 0) { empty.classList.remove('hidden'); stats.classList.add('hidden'); return; }
+      empty.classList.add('hidden'); stats.classList.remove('hidden');
+
+      // Hitung total statistik
+      let totH=0, totS=0, totI=0, totA=0;
+      data.forEach(r => { totH += r.H||0; totS += r.S||0; totI += r.I||0; totA += r.A||0; });
+      document.getElementById('hadirStatSiswa').innerText = data.length;
+      document.getElementById('hadirStatH').innerText = totH;
+      document.getElementById('hadirStatS').innerText = totS;
+      document.getElementById('hadirStatI').innerText = totI;
+      document.getElementById('hadirStatA').innerText = totA;
+
+      data.forEach(function(r, i) {
+        let total   = (r.H||0) + (r.S||0) + (r.I||0) + (r.A||0);
+        let pctNum  = total > 0 ? Math.round((r.H||0) / total * 100) : 0;
+        let pctColor = pctNum >= 80 ? 'text-emerald-300' : pctNum >= 60 ? 'text-yellow-300' : 'text-red-300';
+        let barColor = pctNum >= 80 ? 'bg-emerald-500' : pctNum >= 60 ? 'bg-yellow-500' : 'bg-red-500';
+        let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
+
+        let tr = document.createElement('tr');
+        tr.className = rowBg + ' hover:bg-emerald-500/5 transition-colors';
+        tr.innerHTML = `
+          <td class="px-3 py-2.5 font-semibold text-slate-100">${r.nama || '-'}</td>
+          <td class="px-3 py-2.5 text-center">
+            <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">${r.kelas||'-'}</span>
+          </td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-emerald-300">${r.H||0}</td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-yellow-300">${r.S||0}</td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-sky-300">${r.I||0}</td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-red-300">${r.A||0}</td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-orange-300">${r.T||total}</td>
+          <td class="px-3 py-2.5 text-center">
+            <div class="flex items-center gap-1.5">
+              <div class="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="${barColor} h-1.5 rounded-full transition-all" style="width:${pctNum}%"></div>
+              </div>
+              <span class="font-extrabold text-[10px] ${pctColor} w-8 text-right">${pctNum}%</span>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ================= NILAI SUMATIF =================
+    let nilaiDataGlobal = [];
+
+    function toggleNilaiModal() {
+      let modal = document.getElementById('nilaiModal');
+      let isHiding = !modal.classList.contains('hidden');
+      modal.classList.toggle('hidden');
+      document.body.style.overflow = isHiding ? '' : 'hidden';
+      if (!isHiding) {
+        // Isi dropdown kelas
+        let sel = document.getElementById('nilaiFilterKelas');
+        let kelasSelect = document.getElementById('dropdownKelas');
+        sel.innerHTML = '<option value="">-- Semua Kelas --</option>';
+        Array.from(kelasSelect.options).forEach(opt => {
+          if (opt.value) {
+            let o = document.createElement('option');
+            o.value = opt.value; o.innerText = opt.value;
+            if (opt.value === kelasSelect.value) o.selected = true;
+            sel.appendChild(o);
+          }
+        });
+        loadNilaiSumatif();
+      }
+    }
+
+    function loadNilaiSumatif() {
+      let kelas   = document.getElementById('nilaiFilterKelas').value;
+      let loading = document.getElementById('nilaiLoading');
+      let empty   = document.getElementById('nilaiEmpty');
+      let stats   = document.getElementById('nilaiStats');
+      let tbody   = document.getElementById('nilaiTbody');
+      tbody.innerHTML = ''; empty.classList.add('hidden'); stats.classList.add('hidden');
+      loading.classList.remove('hidden');
+      document.getElementById('nilaiJumlah').innerText = '0';
+
+      google.script.run
+        .withSuccessHandler(function(data) {
+          loading.classList.add('hidden');
+          nilaiDataGlobal = data || [];
+          filterNilaiLokal();
+        })
+        .withFailureHandler(function(err) {
+          loading.classList.add('hidden');
+          showToast('Gagal memuat nilai: ' + err.message, 'error');
+          empty.classList.remove('hidden');
+        })
+        .getNilaiSumatif(kelas);
+    }
+
+    function filterNilaiLokal() {
+      let cari = document.getElementById('nilaiSearch').value.toLowerCase();
+      let hasil = nilaiDataGlobal.filter(r =>
+        !cari || (r.nama||'').toLowerCase().includes(cari)
+      );
+      renderNilaiSumatif(hasil);
+    }
+
+    function renderNilaiSumatif(data) {
+      let tbody = document.getElementById('nilaiTbody');
+      let empty = document.getElementById('nilaiEmpty');
+      let stats = document.getElementById('nilaiStats');
+      tbody.innerHTML = '';
+      document.getElementById('nilaiJumlah').innerText = data.length;
+
+      if (data.length === 0) { empty.classList.remove('hidden'); stats.classList.add('hidden'); return; }
+      empty.classList.add('hidden'); stats.classList.remove('hidden');
+
+      // Hitung rata-rata kelas
+      let s1arr = data.filter(r => r.s1 !== null && r.s1 !== '' && !isNaN(parseFloat(r.s1))).map(r => parseFloat(r.s1));
+      let s2arr = data.filter(r => r.s2 !== null && r.s2 !== '' && !isNaN(parseFloat(r.s2))).map(r => parseFloat(r.s2));
+      let s3arr = data.filter(r => r.s3 !== null && r.s3 !== '' && !isNaN(parseFloat(r.s3))).map(r => parseFloat(r.s3));
+      let allArr = [...s1arr, ...s2arr, ...s3arr];
+      let avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : '-';
+      document.getElementById('nilaiStatS1').innerText  = avg(s1arr);
+      document.getElementById('nilaiStatS2').innerText  = avg(s2arr);
+      document.getElementById('nilaiStatS3').innerText  = avg(s3arr);
+      document.getElementById('nilaiStatAll').innerText = avg(allArr);
+
+      data.forEach(function(r, i) {
+        let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
+
+        function nilaiCell(val, warnaBaik, warnaKurang) {
+          if (val === null || val === '' || val === undefined || isNaN(parseFloat(val))) return '<span class="text-slate-600">—</span>';
+          let n = parseFloat(val);
+          let warna = n >= 75 ? warnaBaik : n >= 60 ? 'text-yellow-300' : warnaKurang;
+          return `<span class="font-extrabold ${warna}">${n.toFixed(1)}</span>`;
+        }
+
+        // Hitung rata-rata per siswa — hanya nilai yang benar-benar ada
+        let vals = [r.s1, r.s2, r.s3].filter(v => v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))).map(v => parseFloat(v));
+        let rataStr = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '—';
+        let rataNum = vals.length ? parseFloat(rataStr) : null;
+        let rataWarna = rataNum === null ? 'text-slate-500' : rataNum >= 75 ? 'text-purple-300' : rataNum >= 60 ? 'text-yellow-300' : 'text-red-300';
+
+        // Progress bar rata-rata
+        let pct = rataNum ? Math.min(rataNum, 100) : 0;
+        let barColor = pct >= 75 ? 'bg-purple-500' : pct >= 60 ? 'bg-yellow-500' : 'bg-red-500';
+
+        let tr = document.createElement('tr');
+        tr.className = rowBg + ' hover:bg-indigo-500/5 transition-colors';
+        tr.innerHTML = `
+          <td class="px-3 py-3 font-semibold text-slate-100">${r.nama||'-'}</td>
+          <td class="px-3 py-3 text-center">
+            <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">${r.kelas||'-'}</span>
+          </td>
+          <td class="px-3 py-3 text-center">${nilaiCell(r.s1,'text-emerald-300','text-red-300')}</td>
+          <td class="px-3 py-3 text-center">${nilaiCell(r.s2,'text-yellow-300','text-red-300')}</td>
+          <td class="px-3 py-3 text-center">${nilaiCell(r.s3,'text-orange-300','text-red-300')}</td>
+          <td class="px-3 py-3">
+            <div class="flex items-center gap-1.5">
+              <div class="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="${barColor} h-1.5 rounded-full" style="width:${pct}%"></div>
+              </div>
+              <span class="font-extrabold text-[10px] ${rataWarna} w-8 text-right">${rataStr}</span>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ================= KALKULATOR =================
+    let kalcCurrent = '0', kalcPrev = '', kalcOp = '', kalcReset = false;
+
+    function kalcSetDisplay(val) {
+      let str = String(val);
+      // Potong desimal berlebih
+      if (str.includes('.') && str.split('.')[1]?.length > 10) {
+        str = parseFloat(parseFloat(str).toPrecision(12)).toString();
+      }
+      document.getElementById('kalcDisplay').innerText = str;
+    }
+
+    function kalcSetExpr(val) {
+      document.getElementById('kalcExpr').innerText = val || '\u00a0';
+    }
+
+    function kalcAksi(k) {
+      if (k === 'AC') {
+        kalcCurrent = '0'; kalcPrev = ''; kalcOp = ''; kalcReset = false;
+        kalcSetDisplay('0'); kalcSetExpr('');
+        return;
+      }
+      if (k === '⌫') {
+        if (kalcReset) { kalcCurrent = '0'; kalcReset = false; kalcSetDisplay('0'); return; }
+        kalcCurrent = kalcCurrent.length > 1 ? kalcCurrent.slice(0,-1) : '0';
+        kalcSetDisplay(kalcCurrent); return;
+      }
+      if (k === '+/-') {
+        kalcCurrent = kalcCurrent.startsWith('-') ? kalcCurrent.slice(1) : '-' + kalcCurrent;
+        kalcSetDisplay(kalcCurrent); return;
+      }
+      if (['+','-','*','/'].includes(k)) {
+        if (kalcOp && !kalcReset) kalcHitung();
+        kalcPrev = kalcCurrent; kalcOp = k; kalcReset = true;
+        let opSym = {'+':'+','-':'−','*':'×','/':'÷'}[k];
+        kalcSetExpr(kalcCurrent + ' ' + opSym);
+        return;
+      }
+      if (k === '=') {
+        if (!kalcOp) return;
+        let exprStr = kalcPrev + ' ' + {'+':'+','-':'−','*':'×','/':'÷'}[kalcOp] + ' ' + kalcCurrent + ' =';
+        kalcHitung(); kalcSetExpr(exprStr); kalcOp = ''; return;
+      }
+      if (k === '.') {
+        if (kalcReset) { kalcCurrent = '0'; kalcReset = false; }
+        if (kalcCurrent.includes('.')) return;
+        kalcCurrent += '.'; kalcSetDisplay(kalcCurrent); return;
+      }
+      // Angka
+      if (kalcReset) { kalcCurrent = k; kalcReset = false; }
+      else kalcCurrent = kalcCurrent === '0' ? k : kalcCurrent + k;
+      kalcSetDisplay(kalcCurrent);
+    }
+
+    function kalcHitung() {
+      let a = parseFloat(kalcPrev), b = parseFloat(kalcCurrent), res;
+      if (isNaN(a) || isNaN(b)) return;
+      if      (kalcOp === '+') res = a + b;
+      else if (kalcOp === '-') res = a - b;
+      else if (kalcOp === '*') res = a * b;
+      else if (kalcOp === '/') { res = b === 0 ? 'Error' : a / b; }
+      kalcCurrent = String(res); kalcReset = true;
+      kalcSetDisplay(kalcCurrent);
+    }
+
+    function kalcSci(fn) {
+      let val = parseFloat(kalcCurrent);
+      let res;
+      switch(fn) {
+        case 'sin':  res = Math.sin(val * Math.PI / 180); break;
+        case 'cos':  res = Math.cos(val * Math.PI / 180); break;
+        case 'tan':  res = Math.tan(val * Math.PI / 180); break;
+        case 'sqrt': res = val >= 0 ? Math.sqrt(val) : 'Error'; break;
+        case 'pow2': res = val * val; break;
+        case 'log':  res = val > 0 ? Math.log10(val) : 'Error'; break;
+        case 'ln':   res = val > 0 ? Math.log(val) : 'Error'; break;
+        case 'pi':   res = Math.PI; break;
+        case 'pct':  res = val / 100; break;
+        case 'inv':  res = val !== 0 ? 1 / val : 'Error'; break;
+      }
+      kalcSetExpr(fn + '(' + kalcCurrent + ') =');
+      kalcCurrent = String(res); kalcReset = true;
+      kalcSetDisplay(kalcCurrent);
+    }
+
+    function kalcSetMode(mode) {
+      let isStd = mode === 'std';
+      document.getElementById('kalcPadStd').classList.toggle('hidden', !isStd);
+      document.getElementById('kalcPadSci').classList.toggle('hidden',  isStd);
+      document.getElementById('kalcMode').innerText = isStd ? 'Standard' : 'Saintifik';
+      let aktif    = 'flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 cursor-pointer transition-all';
+      let nonaktif = 'flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500 border border-slate-800 cursor-pointer transition-all hover:text-yellow-300';
+      document.getElementById('kalcTabStd').className = isStd ? aktif : nonaktif;
+      document.getElementById('kalcTabSci').className = isStd ? nonaktif : aktif;
+      kalcCurrent = '0'; kalcPrev = ''; kalcOp = ''; kalcReset = false;
+      kalcSetDisplay('0'); kalcSetExpr('');
+    }
+
+    // Keyboard support untuk kalkulator
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('kalkulatorModal').classList.contains('hidden')) return;
+      if ('0123456789'.includes(e.key)) { kalcAksi(e.key); return; }
+      if (['+','-','*','/'].includes(e.key)) { kalcAksi(e.key); return; }
+      if (e.key === 'Enter' || e.key === '=') { kalcAksi('='); return; }
+      if (e.key === 'Backspace') { kalcAksi('⌫'); return; }
+      if (e.key === 'Escape') { _modalToggle('kalkulatorModal'); return; }
+      if (e.key === '.') { kalcAksi('.'); return; }
+    });
+
+    // ================= TIMER FEATURES =================
+    function _modalToggle(id) {
+      let el = document.getElementById(id);
+      let isHiding = !el.classList.contains('hidden');
+      el.classList.toggle('hidden');
+      document.body.style.overflow = isHiding ? '' : 'hidden';
+    }
+    function toggleTimerModal()     { _modalToggle('timerModal'); }
+    function toggleKelompokModal()  { _modalToggle('kelompokModal'); }
+    function toggleTranslateModal() { _modalToggle('translateModal'); }
+
+    function switchTimerTab(tab) {
+      let aktif    = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md';
+      let nonaktif = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-blue-400/70 hover:text-blue-200 border border-blue-500/20';
+      let aktifSW  = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md';
+      if (tab === 'timer') {
+        document.getElementById('tTabBtnTimer').className = aktif;
+        document.getElementById('tTabBtnSW').className    = nonaktif;
+        document.getElementById('tPanelTimer').classList.remove('hidden');
+        document.getElementById('tPanelSW').classList.add('hidden');
+      } else {
+        document.getElementById('tTabBtnSW').className    = aktifSW;
+        document.getElementById('tTabBtnTimer').className = nonaktif.replace('red-600 to-purple-600','emerald-600 to-teal-500');
+        document.getElementById('tTabBtnTimer').className = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-blue-400/70 hover:text-blue-200 border border-blue-500/20';
+        document.getElementById('tPanelSW').classList.remove('hidden');
+        document.getElementById('tPanelTimer').classList.add('hidden');
+      }
+    }
+    function updateTimerDisplay() {
+      let m = Math.floor(timerSisaWaktu / 60); let s = timerSisaWaktu % 60;
+      let disp = document.getElementById('timerDisplay');
+      disp.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      // Warna merah & pulse saat <= 10 detik
+      if (timerSisaWaktu <= 10 && timerSisaWaktu > 0) {
+        disp.classList.add('timer-urgent');
+      } else {
+        disp.classList.remove('timer-urgent');
+      }
+    }
+    function modifyTimer(detik) {
+      if(timerSisaWaktu + detik >= 0) {
+        timerSisaWaktu += detik;
+        updateTimerDisplay();
+        showToast(`Durasi waktu dimodifikasi.`, "warning");
+      }
+    }
+    // Bunyi alarm menggunakan Web Audio API (tidak butuh file eksternal)
+    function bunyikanAlarm() {
+      try {
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let beeps = [0, 200, 400, 600, 800]; // 5 beep berurutan
+        beeps.forEach((delay, i) => {
+          let osc = ctx.createOscillator();
+          let gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(i < 4 ? 880 : 1320, ctx.currentTime + delay / 1000);
+          gain.gain.setValueAtTime(0.4, ctx.currentTime + delay / 1000);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (delay + 180) / 1000);
+          osc.start(ctx.currentTime + delay / 1000);
+          osc.stop(ctx.currentTime + (delay + 180) / 1000);
+        });
+      } catch(e) { console.warn('Audio tidak tersedia:', e); }
+    }
+    function startTimer() {
+      if (timerBerjalan) return; timerBerjalan = true;
+      showToast("Timer aktivitas kelas dimulai.", "success");
+      timerInterval = setInterval(function() {
+        if(timerSisaWaktu > 0) { timerSisaWaktu--; updateTimerDisplay(); } 
+        else { 
+          clearInterval(timerInterval); timerBerjalan = false;
+          bunyikanAlarm();
+          document.getElementById('timerDisplay').classList.remove('timer-urgent');
+          showToast("⏰ Alokasi waktu pengerjaan telah habis!", "error");
+        }
+      }, 1000);
+    }
+    function pauseTimer() { clearInterval(timerInterval); timerBerjalan = false; showToast("Timer dihentikan sementara.", "warning"); }
+    function resetTimer() {
+      clearInterval(timerInterval); timerBerjalan = false; timerSisaWaktu = 300;
+      document.getElementById('timerDisplay').classList.remove('timer-urgent');
+      updateTimerDisplay(); showToast("Sistem mengembalikan waktu default (5m).", "warning");
+    }
+
+    // ================= STOPWATCH FEATURES =================
+    let swInterval   = null;
+    let swElapsed    = 0;      // ms
+    let swRunning    = false;
+    let swStartTime  = null;
+    let swLaps       = [];
+
+    function formatSW(ms) {
+      let totalSec = Math.floor(ms / 1000);
+      let cs       = Math.floor((ms % 1000) / 10);
+      let m        = Math.floor(totalSec / 60);
+      let s        = totalSec % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s +
+             '<span class="text-2xl text-emerald-500/60">.' + (cs < 10 ? '0' : '') + cs + '</span>';
+    }
+
+    function updateSWDisplay() {
+      let now = swRunning ? swElapsed + (Date.now() - swStartTime) : swElapsed;
+      document.getElementById('swDisplay').innerHTML = formatSW(now);
+    }
+
+    function startStopwatch() {
+      if (swRunning) return;
+      swRunning   = true;
+      swStartTime = Date.now();
+      swInterval  = setInterval(updateSWDisplay, 30);
+      showToast("Stopwatch dimulai.", "success");
+    }
+
+    function pauseStopwatch() {
+      if (!swRunning) return;
+      swElapsed  += Date.now() - swStartTime;
+      swRunning   = false;
+      clearInterval(swInterval);
+      showToast("Stopwatch dijeda.", "warning");
+    }
+
+    function lapStopwatch() {
+      if (!swRunning && swElapsed === 0) return;
+      let now = swRunning ? swElapsed + (Date.now() - swStartTime) : swElapsed;
+      swLaps.push(now);
+      let lapList = document.getElementById('swLapList');
+      lapList.classList.remove('hidden');
+      // Hitung selisih antar lap
+      let prev      = swLaps.length > 1 ? swLaps[swLaps.length - 2] : 0;
+      let diff      = now - prev;
+      let lapNum    = swLaps.length;
+      let totalSec  = Math.floor(now / 1000);
+      let m = Math.floor(totalSec / 60); let s = totalSec % 60;
+      let ds = Math.floor((now % 1000) / 10);
+      let dSec  = Math.floor(diff / 1000);
+      let dm = Math.floor(dSec / 60); let dsec = dSec % 60;
+      let dcs = Math.floor((diff % 1000) / 10);
+      let row = document.createElement('div');
+      row.className = 'flex items-center justify-between text-[10px] font-bold border-b border-emerald-500/10 py-1 last:border-0';
+      row.innerHTML = `
+        <span class="text-blue-400/70">Lap ${lapNum}</span>
+        <span class="text-slate-400 font-mono">+${(dm<10?'0':'')+dm}:${(dsec<10?'0':'')+dsec}.${(dcs<10?'0':'')+dcs}</span>
+        <span class="text-emerald-300 font-mono">${(m<10?'0':'')+m}:${(s<10?'0':'')+s}.${(ds<10?'0':'')+ds}</span>
+      `;
+      lapList.insertBefore(row, lapList.firstChild);
+      showToast(`Lap ${lapNum} dicatat.`, "success");
+    }
+
+    function resetStopwatch() {
+      clearInterval(swInterval);
+      swRunning = false; swElapsed = 0; swStartTime = null; swLaps = [];
+      document.getElementById('swDisplay').innerHTML = '00:00<span class="text-2xl text-emerald-500/60">.00</span>';
+      let lapList = document.getElementById('swLapList');
+      lapList.innerHTML = ''; lapList.classList.add('hidden');
+      showToast("Stopwatch direset.", "warning");
+    }
+
+    // ================= SHUFFLE FEATURES =================
+    function acakKelompok() {
+      if(listNamaSiswaGlobal.length === 0) { showToast("Daftar siswa kosong. Tidak bisa mengacak kelompok!", "error"); return; }
+      toggleKelompokModal(); prosesAcak();
+    }
+    function prosesAcak() {
+      let num = parseInt(document.getElementById('jumlahKelompokInput').value) || 2;
+      let shuffled = [...listNamaSiswaGlobal].sort(() => Math.random() - 0.5);
+      let kelompokList = Array.from({ length: num }, () => []);
+      shuffled.forEach((siswaObj, idx) => { kelompokList[idx % num].push(siswaObj.nama); });
+
+      let container = document.getElementById('hasilKelompokContainer'); container.innerHTML = '';
+      
+      kelompokList.forEach((anggota, i) => {
+        if(anggota.length === 0) return;
+        let div = document.createElement('div');
+        div.className = "p-4 bg-black/60 border border-purple-500/20 rounded-2xl flex flex-col gap-2 shadow-lg shadow-black/40";
+        
+        let htmlAnggotaKapsul = anggota.map(namaSiswa => `
+          <div class="px-3 py-2 bg-slate-950 border border-purple-500/10 rounded-xl text-xs font-bold text-slate-300 flex items-center gap-2">
+            <span class="material-icons-sharp text-purple-400/40 text-xs">person</span>
+            <span>${namaSiswa}</span>
+          </div>
+        `).join('');
+
+        div.innerHTML = `
+          <div class="flex items-center space-x-2 border-b border-purple-500/10 pb-2 mb-1">
+            <span class="w-2 h-2 rounded-full bg-gradient-to-r from-red-500 to-blue-500 animate-pulse"></span>
+            <h4 class="text-xs font-black text-purple-300 uppercase tracking-widest">Kelompok ${i + 1}</h4>
+            <span class="text-[10px] bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/20 ml-auto font-black">${anggota.length} Siswa</span>
+          </div>
+          <div class="grid grid-cols-1 gap-1.5">
+            ${htmlAnggotaKapsul}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      showToast("Formasi kelompok acak berhasil dibuat.", "success");
+    }
+
+    // ================= WHEEL FEATURES =================
+    let wheelSpinning = false;
+    let wheelAngle = 0;
+    let wheelNames = [];
+    const wheelColors = ['#7c3aed','#dc2626','#2563eb','#9333ea','#b91c1c','#1d4ed8','#6d28d9','#991b1b','#1e40af'];
+
+    function toggleWheelModal() {
+      let modal = document.getElementById('wheelModal');
+      let isHiding = !modal.classList.contains('hidden');
+      modal.classList.toggle('hidden');
+      document.body.style.overflow = isHiding ? '' : 'hidden';
+      if (!document.getElementById('wheelModal').classList.contains('hidden')) {
+        // Ambil nama siswa dari daftar aktif
+        wheelNames = listNamaSiswaGlobal.length > 0
+          ? listNamaSiswaGlobal.map(s => s.nama)
+          : ['Siswa 1','Siswa 2','Siswa 3','Siswa 4','Siswa 5'];
+        document.getElementById('wheelResult').classList.add('hidden');
+        gambarWheel();
+      }
+    }
+
+    function acakUlangWheel() {
+      if (wheelSpinning) return;
+      wheelAngle = 0;
+      document.getElementById('wheelResult').classList.add('hidden');
+      gambarWheel();
+      showToast("Wheel direset.", "warning");
+    }
+
+    function gambarWheel(angle) {
+      let canvas = document.getElementById('wheelCanvas');
+      let ctx = canvas.getContext('2d');
+      let n = wheelNames.length;
+      let arc = (2 * Math.PI) / n;
+      let cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width / 2 - 4;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Bayangan lingkaran
+      ctx.save();
+      ctx.shadowColor = '#7c3aed60';
+      ctx.shadowBlur = 24;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+      ctx.fillStyle = '#0d0218'; ctx.fill();
+      ctx.restore();
+
+      for (let i = 0; i < n; i++) {
+        let start = (angle || 0) + i * arc;
+        let end = start + arc;
+        // Slice
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.fillStyle = wheelColors[i % wheelColors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#0d0218';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + arc / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${n > 20 ? 8 : n > 12 ? 10 : 12}px 'Plus Jakarta Sans', sans-serif`;
+        let label = wheelNames[i].length > 14 ? wheelNames[i].substring(0,13)+'…' : wheelNames[i];
+        ctx.fillText(label, r - 8, 4);
+        ctx.restore();
+      }
+
+      // Lingkaran tengah
+      ctx.beginPath(); ctx.arc(cx, cy, 22, 0, 2*Math.PI);
+      ctx.fillStyle = '#0d0218'; ctx.fill();
+      ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 3; ctx.stroke();
+    }
+
+    function putarWheel() {
+      if (wheelSpinning || wheelNames.length === 0) return;
+      wheelSpinning = true;
+      document.getElementById('wheelResult').classList.add('hidden');
+      document.getElementById('btnPutarWheel').disabled = true;
+
+      let extraSpin = (5 + Math.random() * 5) * 2 * Math.PI; // 5–10 putaran penuh
+      let targetAngle = wheelAngle + extraSpin + Math.random() * 2 * Math.PI;
+      let duration = 3500 + Math.random() * 1500; // 3.5–5 detik
+      let startTime = null;
+
+      // Bunyi saat mulai putar
+      try {
+        let ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = ctx2.createOscillator(); let g = ctx2.createGain();
+        osc.connect(g); g.connect(ctx2.destination);
+        osc.frequency.value = 440; g.gain.setValueAtTime(0.15, ctx2.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.3);
+        osc.start(); osc.stop(ctx2.currentTime + 0.3);
+      } catch(e){}
+
+      function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+      function frame(ts) {
+        if (!startTime) startTime = ts;
+        let progress = Math.min((ts - startTime) / duration, 1);
+        let currentAngle = wheelAngle + (targetAngle - wheelAngle) * easeOut(progress);
+        gambarWheel(currentAngle);
+
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          wheelAngle = targetAngle % (2 * Math.PI);
+          wheelSpinning = false;
+          document.getElementById('btnPutarWheel').disabled = false;
+
+          // Tentukan siswa terpilih
+          let n = wheelNames.length;
+          let arc = (2 * Math.PI) / n;
+          // Pointer di atas (sudut 0 = kanan, pointer di atas = -π/2)
+          let normalizedAngle = (((-wheelAngle - Math.PI / 2) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+          let idx = Math.floor(normalizedAngle / arc) % n;
+          let terpilih = wheelNames[idx];
+
+          document.getElementById('wheelResultText').innerText = terpilih;
+          document.getElementById('wheelResult').classList.remove('hidden');
+          showToast(`🎯 Terpilih: ${terpilih}`, "success");
+
+          // Bunyi ding saat berhenti
+          try {
+            let ctx3 = new (window.AudioContext || window.webkitAudioContext)();
+            [523, 659, 784].forEach((f, i) => {
+              let o = ctx3.createOscillator(); let g = ctx3.createGain();
+              o.connect(g); g.connect(ctx3.destination);
+              o.frequency.value = f; g.gain.setValueAtTime(0.3, ctx3.currentTime + i*0.12);
+              g.gain.exponentialRampToValueAtTime(0.001, ctx3.currentTime + i*0.12 + 0.3);
+              o.start(ctx3.currentTime + i*0.12); o.stop(ctx3.currentTime + i*0.12 + 0.3);
+            });
+          } catch(e){}
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // ================= TRANSLATE FEATURES =================
+
+    function swapLang() {
+      let f = document.getElementById('translateFrom');
+      let t = document.getElementById('translateTo');
+      let tmp = f.value; f.value = t.value; t.value = tmp;
+    }
+
+    async function doTranslate() {
+      let teks = document.getElementById('translateInput').value.trim();
+      let from = document.getElementById('translateFrom').value;
+      let to = document.getElementById('translateTo').value;
+      let out = document.getElementById('translateOutput');
+      let btn = document.getElementById('btnTranslate');
+
+      if (!teks) { showToast("Masukkan teks yang ingin diterjemahkan.", "error"); return; }
+      if (from === to) { out.innerText = teks; return; }
+
+      btn.disabled = true;
+      out.innerText = 'Menerjemahkan...';
+
+      try {
+        // Gunakan MyMemory API (gratis, tanpa API key)
+        let langPair = `${from}|${to}`;
+        let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(teks)}&langpair=${langPair}`;
+        let res = await fetch(url);
+        let data = await res.json();
+        if (data.responseStatus === 200) {
+          out.innerText = data.responseData.translatedText;
+          showToast("Terjemahan berhasil.", "success");
+        } else {
+          out.innerText = 'Gagal menerjemahkan. Coba lagi.';
+          showToast("Gagal menerjemahkan.", "error");
+        }
+      } catch(e) {
+        out.innerText = 'Tidak dapat terhubung ke layanan terjemahan.';
+        showToast("Koneksi gagal.", "error");
+      }
+      btn.disabled = false;
+    }
+
+    function copyTranslation() {
+      let teks = document.getElementById('translateOutput').innerText;
+      if (!teks) { showToast("Tidak ada teks untuk disalin.", "error"); return; }
+      navigator.clipboard.writeText(teks).then(() => showToast("Teks disalin ke clipboard.", "success")).catch(() => showToast("Gagal menyalin.", "error"));
+    }
+
+    // ================= JURNAL FEATURES =================
+    let jurnalDataGlobal = [];
+    let jurnalDataFiltered = [];
+    let sheetJurnalDataGlobal = [];
+    let currentJurnalTab = 'rekap';
+
+    function switchJurnalTab(tab) {
+      currentJurnalTab = tab;
+      let aktif    = 'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md';
+      let nonaktif = 'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-emerald-400/70 hover:text-emerald-200 border border-emerald-500/20';
+      ['Rekap','Sheet','Hadir'].forEach(function(t) {
+        let btn   = document.getElementById('jTabBtn' + t);
+        let panel = document.getElementById('jPanel' + t);
+        if (btn)   btn.className = nonaktif;
+        if (panel) { panel.classList.add('hidden'); panel.classList.remove('flex'); }
+      });
+      let keyMap = { rekap:'Rekap', sheet:'Sheet', hadir:'Hadir' };
+      let key = keyMap[tab] || 'Rekap';
+      let ab = document.getElementById('jTabBtn' + key);
+      let ap = document.getElementById('jPanel' + key);
+      if (ab) ab.className = aktif;
+      if (ap) { ap.classList.remove('hidden'); ap.classList.add('flex'); }
+      if (tab === 'sheet') loadSheetJurnal();
+      if (tab === 'hadir') loadRekapHadir();
+    }
+
+    function toggleJurnalModal() {
+      let modal = document.getElementById('jurnalModal');
+      let isHiding = !modal.classList.contains('hidden');
+      modal.classList.toggle('hidden');
+      document.body.style.overflow = isHiding ? '' : 'hidden';
+      if (!modal.classList.contains('hidden')) {
+        // Isi dropdown kelas di kedua tab
+        let kelasSelect = document.getElementById('dropdownKelas');
+        ['jurnalFilterKelas','sheetJurnalFilterKelas','hadirFilterKelas'].forEach(function(id) {
+          let sel = document.getElementById(id);
+          sel.innerHTML = '<option value="">-- Semua Kelas --</option>';
+          Array.from(kelasSelect.options).forEach(opt => {
+            if (opt.value) {
+              let o = document.createElement('option');
+              o.value = opt.value; o.innerText = opt.value;
+              if (opt.value === kelasSelect.value) o.selected = true;
+              sel.appendChild(o);
+            }
+          });
+        });
+        // Reset ke tab rekap
+        switchJurnalTab('rekap');
+        loadJurnal();
+      }
+    }
+
+    function loadJurnal() {
+      let kelas = document.getElementById('jurnalFilterKelas').value;
+      let loading = document.getElementById('jurnalLoading');
+      let empty   = document.getElementById('jurnalEmpty');
+      let list    = document.getElementById('jurnalList');
+      let stats   = document.getElementById('jurnalStats');
+      list.innerHTML = ''; empty.classList.add('hidden'); stats.classList.add('hidden');
+      loading.classList.remove('hidden');
+      document.getElementById('jurnalJumlah').innerText = '0';
+      google.script.run.withSuccessHandler(function(data) {
+        loading.classList.add('hidden');
+        jurnalDataGlobal = data || [];
+        filterJurnalLokal();
+      }).withFailureHandler(function(err) {
+        loading.classList.add('hidden');
+        showToast('Gagal memuat jurnal: ' + err.message, 'error');
+        empty.classList.remove('hidden');
+      }).getJurnalByKelas(kelas);
+    }
+
+    // ── Load Sheet Jurnal langsung dari GAS ────────────────
+    function loadSheetJurnal() {
+      let kelas   = document.getElementById('sheetJurnalFilterKelas').value;
+      let loading = document.getElementById('sheetJurnalLoading');
+      let empty   = document.getElementById('sheetJurnalEmpty');
+      let tbody   = document.getElementById('sheetJurnalTbody');
+      tbody.innerHTML = ''; empty.classList.add('hidden');
+      loading.classList.remove('hidden');
+      document.getElementById('sheetJurnalJumlah').innerText = '0';
+      google.script.run.withSuccessHandler(function(data) {
+        loading.classList.add('hidden');
+        sheetJurnalDataGlobal = data || [];
+        filterSheetJurnalLokal();
+      }).withFailureHandler(function(err) {
+        loading.classList.add('hidden');
+        showToast('Gagal membaca sheet Jurnal: ' + err.message, 'error');
+        empty.classList.remove('hidden');
+      }).getSheetJurnal(kelas);
+    }
+
+    function filterSheetJurnalLokal() {
+      let cari  = document.getElementById('sheetJurnalSearch').value.toLowerCase();
+      let hasil = sheetJurnalDataGlobal.filter(function(r) {
+        return !cari || (r.materi||'').toLowerCase().includes(cari) || (r.catatan||'').toLowerCase().includes(cari);
+      });
+      renderSheetJurnal(hasil);
+    }
+
+    function renderSheetJurnal(data) {
+      let tbody = document.getElementById('sheetJurnalTbody');
+      let empty = document.getElementById('sheetJurnalEmpty');
+      tbody.innerHTML = '';
+      document.getElementById('sheetJurnalJumlah').innerText = data.length;
+      if (data.length === 0) { empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+
+      data.forEach(function(r, i) {
+        let isPresensi = (r.keterangan||'').toLowerCase().includes('presensi');
+        let tipeBadge  = isPresensi
+          ? '<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/20">Presensi</span>'
+          : '<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">Penilaian</span>';
+        let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
+        let tr = document.createElement('tr');
+        tr.className = rowBg + ' hover:bg-emerald-500/5 transition-colors';
+        tr.innerHTML = `
+          <td class="px-3 py-2.5 text-slate-300 whitespace-nowrap">${r.tanggal || '-'}</td>
+          <td class="px-3 py-2.5 font-bold text-emerald-300 whitespace-nowrap">${r.kelas || '-'}</td>
+          <td class="px-3 py-2.5 text-center font-extrabold text-purple-300">${r.pertemuan || '-'}</td>
+          <td class="px-3 py-2.5 text-center font-bold text-blue-300">${r.jp || '-'}</td>
+          <td class="px-3 py-2.5 text-slate-200 max-w-[200px] truncate" title="${r.materi||''}">${r.materi || '-'}</td>
+          <td class="px-3 py-2.5 text-slate-400 max-w-[180px] truncate italic" title="${r.catatan||''}">${r.catatan || '-'}</td>
+          <td class="px-3 py-2.5 text-center">${tipeBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterJurnalLokal() {
+      let tipe = document.getElementById('jurnalFilterTipe').value.toLowerCase();
+      let cari = document.getElementById('jurnalSearch').value.toLowerCase();
+
+      jurnalDataFiltered = jurnalDataGlobal.filter(j => {
+        let cocokTipe = !tipe || (j.tipe || '').toLowerCase() === tipe;
+        let cocokCari = !cari || (j.materi || '').toLowerCase().includes(cari) || (j.catatan || '').toLowerCase().includes(cari);
+        return cocokTipe && cocokCari;
+      });
+
+      renderJurnalList(jurnalDataFiltered);
+    }
+
+    function renderJurnalList(data) {
+      let list = document.getElementById('jurnalList');
+      let empty = document.getElementById('jurnalEmpty');
+      let stats = document.getElementById('jurnalStats');
+      list.innerHTML = '';
+      document.getElementById('jurnalJumlah').innerText = data.length;
+
+      if (data.length === 0) {
+        empty.classList.remove('hidden'); stats.classList.add('hidden'); return;
+      }
+      empty.classList.add('hidden'); stats.classList.remove('hidden');
+
+      // Hitung statistik
+      let totalHadir = 0, totalSiswaPresensi = 0, totalNilai = 0, totalSiswaNilai = 0, totalAlpha = 0;
+      data.forEach(j => {
+        if (j.tipe === 'presensi' && j.siswa) {
+          j.siswa.forEach(s => {
+            totalSiswaPresensi++;
+            if (s.status === 'H') totalHadir++;
+            if (s.status === 'A') totalAlpha++;
+          });
+        }
+        if (j.tipe === 'penilaian' && j.siswa) {
+          j.siswa.forEach(s => { totalNilai += parseFloat(s.nilai || 0); totalSiswaNilai++; });
+        }
+      });
+      document.getElementById('statTotalSesi').innerText = data.length;
+      document.getElementById('statRataHadir').innerText = totalSiswaPresensi > 0 ? Math.round(totalHadir / totalSiswaPresensi * 100) + '%' : '-';
+      document.getElementById('statRataNilai').innerText = totalSiswaNilai > 0 ? (totalNilai / totalSiswaNilai).toFixed(1) : '-';
+      document.getElementById('statTotalAlpha').innerText = totalAlpha;
+
+      // Sort terbaru di atas
+      let sorted = [...data].sort((a, b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
+
+      sorted.forEach((j, idx) => {
+        let isPresensi = j.tipe === 'presensi';
+        let tipeColor = isPresensi ? 'emerald' : 'blue';
+        let tipeLabel = isPresensi ? 'Presensi' : 'Penilaian';
+        let tipeIcon = isPresensi ? 'fact_check' : 'stars';
+
+        // Ringkasan siswa
+        let siswaHtml = '';
+        let badgeStats = '';
+        if (j.siswa && j.siswa.length > 0) {
+          if (isPresensi) {
+            let counts = {H:0,S:0,I:0,A:0,B:0};
+            j.siswa.forEach(s => { if(counts[s.status] !== undefined) counts[s.status]++; });
+            let badgeColor = {H:'emerald',S:'yellow',I:'sky',A:'red',B:'orange'};
+            badgeStats = Object.entries(counts).filter(([,v]) => v > 0).map(([k,v]) =>
+              `<span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-${badgeColor[k]}-500/20 text-${badgeColor[k]}-300 border border-${badgeColor[k]}-500/20">${k}: ${v}</span>`
+            ).join('');
+          } else {
+            let vals = j.siswa.map(s => parseFloat(s.nilai || 0));
+            let avg = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+            let min = Math.min(...vals); let max = Math.max(...vals);
+            badgeStats = `
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">Rata: ${avg}</span>
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/20">Min: ${min}</span>
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-red-500/20 text-red-300 border border-red-500/20">Max: ${max}</span>
+            `;
+          }
+
+          // Tabel detail siswa (collapsible)
+          let rowsSiswa = j.siswa.map(s => {
+            if (isPresensi) {
+              let sc = {H:'text-emerald-300',S:'text-yellow-300',I:'text-sky-300',A:'text-red-300',B:'text-orange-300'};
+              return `<div class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                <span class="text-xs text-slate-300">${s.nama}</span>
+                <span class="text-xs font-black ${sc[s.status] || 'text-slate-400'}">${s.status}</span>
+              </div>`;
+            } else {
+              let nilaiNum = parseFloat(s.nilai || 0);
+              let warna = nilaiNum >= 80 ? 'text-emerald-300' : nilaiNum >= 65 ? 'text-yellow-300' : 'text-red-300';
+              return `<div class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                <span class="text-xs text-slate-300">${s.nama}</span>
+                <span class="text-xs font-black ${warna}">${s.nilai}</span>
+              </div>`;
+            }
+          }).join('');
+
+          siswaHtml = `
+            <div id="detail_${idx}" class="hidden mt-3 bg-black/40 rounded-xl p-3 border border-white/5 max-h-48 overflow-y-auto">
+              ${rowsSiswa}
+            </div>
+          `;
+        }
+
+        let card = document.createElement('div');
+        card.className = `bg-black/40 border border-${tipeColor}-500/20 rounded-2xl p-4 shadow-lg`;
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <div class="bg-${tipeColor}-500/15 p-2 rounded-xl">
+                <span class="material-icons-sharp text-${tipeColor}-400 text-sm">${tipeIcon}</span>
+              </div>
+              <div>
+                <p class="text-sm font-extrabold text-slate-100 leading-tight">${j.materi || '(Tanpa Materi)'}</p>
+                <p class="text-[10px] font-bold text-slate-500 mt-0.5">${j.kelas || ''} &bull; ${j.tanggal || '-'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 text-[10px] font-black rounded-lg bg-${tipeColor}-500/15 text-${tipeColor}-300 border border-${tipeColor}-500/20 uppercase tracking-wider">${tipeLabel}</span>
+              <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-white/5 text-slate-400 border border-white/10">${(j.siswa||[]).length} siswa</span>
+              ${j.siswa && j.siswa.length > 0 ? `<button onclick="toggleDetailJurnal('detail_${idx}', this)" class="px-2.5 py-1 text-[10px] font-black rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/20 cursor-pointer hover:bg-purple-500/25 transition-all">Detail ▾</button>` : ''}
+            </div>
+          </div>
+          ${badgeStats ? `<div class="flex flex-wrap gap-1.5 mt-3">${badgeStats}</div>` : ''}
+          ${j.catatan ? `<p class="text-[11px] text-slate-500 mt-2 italic leading-relaxed">"${j.catatan}"</p>` : ''}
+          ${siswaHtml}
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function toggleDetailJurnal(id, btn) {
+      let el = document.getElementById(id);
+      if (!el) return;
+      let isHidden = el.classList.toggle('hidden');
+      btn.innerText = isHidden ? 'Detail ▾' : 'Tutup ▴';
+    }
+  </script>
+</body>
+</html>
