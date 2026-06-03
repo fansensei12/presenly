@@ -1219,47 +1219,10 @@
         initJNGlobal();
       }).getDaftarKelas();
 
-      // Auto fullscreen saat halaman dibuka
-      autoFullscreen();
+
     };
 
-    function autoFullscreen() {
-      // Hanya aktif di perangkat mobile / layar kecil
-      let isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
-      if (!isMobile) return;
 
-      let el = document.documentElement;
-      let req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-      if (req) {
-        req.call(el).catch(function() {
-          tampilTombolFullscreen();
-        });
-      } else {
-        tampilTombolFullscreen();
-      }
-    }
-
-    function tampilTombolFullscreen() {
-      // Tambahkan banner sekali klik untuk masuk fullscreen
-      let banner = document.createElement('div');
-      banner.id = 'fsPromptBanner';
-      banner.className = 'fixed top-0 left-0 right-0 z-[70] flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-purple-900/95 to-red-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-xl cursor-pointer';
-      banner.innerHTML = `
-        <div class="flex items-center gap-2 text-xs font-bold text-white">
-          <span class="material-icons-sharp text-yellow-400 text-base">fullscreen</span>
-          Ketuk untuk layar penuh
-        </div>
-        <button onclick="document.getElementById('fsPromptBanner').remove()" class="text-white/50 hover:text-white p-1 rounded-lg">
-          <span class="material-icons-sharp text-sm">close</span>
-        </button>
-      `;
-      banner.addEventListener('click', function(e) {
-        if (e.target.closest('button')) return;
-        autoFullscreen();
-        banner.remove();
-      });
-      document.body.prepend(banner);
-    }
 
     // SOLUSI UTAMA BUG CRASH: Ambil paksa data DOM sebelum beralih komponen visual halaman
     function switchTab(tabTarget) {
