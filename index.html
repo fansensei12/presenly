@@ -18,7 +18,11 @@
 
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(135% 135% at top left, #0d0218 0%, #130520 35%, #1a0508 65%, #050010 100%);
+      background:
+        radial-gradient(ellipse 80% 60% at 0% 0%,   #1a000a 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 100% 0%,  #0a001a 0%, transparent 55%),
+        radial-gradient(ellipse 70% 60% at 50% 100%, #120008 0%, transparent 65%),
+        linear-gradient(160deg, #080008 0%, #0a0008 30%, #0d0010 60%, #050005 100%);
       background-attachment: fixed;
       overscroll-behavior: none;
     }
@@ -59,9 +63,9 @@
     }
 
     /* ── Scrollbar ─────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3b0764; border-radius: 20px; border: 1px solid #dc2626; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0008; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#ff2244,#b026ff); border-radius: 20px; }
 
     /* ── Wheel ─────────────────────────────────────────────── */
     #wheelCanvas { display: block; margin: 0 auto; border-radius: 50%; cursor: pointer; }
@@ -69,75 +73,201 @@
       width: 0; height: 0;
       border-left: 14px solid transparent;
       border-right: 14px solid transparent;
-      border-bottom: 32px solid #ef4444;
-      filter: drop-shadow(0 2px 8px #ef444480);
+      border-bottom: 32px solid #ff2244;
+      filter: drop-shadow(0 2px 12px #ff224480);
       margin: 0 auto;
     }
 
     /* ── Timer pulse ───────────────────────────────────────── */
     @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-    .timer-urgent { animation: timerPulse 0.5s infinite; color: #f87171 !important; border-color: #ef444440 !important; }
+    .timer-urgent { animation: timerPulse 0.5s infinite; color: #ff2244 !important; border-color: #ff224440 !important; }
 
     /* ── Jurnal panel collapse ─────────────────────────────── */
     #jurnalPanelBody { will-change: max-height, opacity; }
 
     /* ── Kalkulator tombol ─────────────────────────────────── */
     .kalc-num {
-      background: #1e1b2e; border: 1px solid #3b3560; color: #e2e8f0;
+      background: #0d0d18; border: 1px solid #2a1a3a; color: #e2e8f0;
       font-size: 1.25rem; font-weight: 800; border-radius: 0.875rem;
-      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
       display: flex; align-items: center; justify-content: center;
     }
-    .kalc-num:active { background: #2d2a45; transform: scale(0.93); }
+    .kalc-num:active { background: #1a1028; transform: scale(0.93); box-shadow: 0 0 10px #b026ff30; }
     .kalc-op {
-      background: #1a1230; border: 1px solid #6d28d9; color: #c4b5fd;
+      background: #0d001a; border: 1px solid #b026ff60; color: #d580ff;
       font-size: 1.4rem; font-weight: 900; border-radius: 0.875rem;
-      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
       display: flex; align-items: center; justify-content: center;
     }
-    .kalc-op:active { background: #2e1065; transform: scale(0.93); }
+    .kalc-op:active { background: #1a0030; transform: scale(0.93); box-shadow: 0 0 14px #b026ff50; }
     .kalc-fn {
-      background: #1a1020; border: 1px solid #831843; color: #f9a8d4;
+      background: #1a0008; border: 1px solid #ff224460; color: #ff8099;
       font-size: 1rem; font-weight: 800; border-radius: 0.875rem;
-      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
       display: flex; align-items: center; justify-content: center;
     }
-    .kalc-fn:active { background: #500724; transform: scale(0.93); }
+    .kalc-fn:active { background: #2a0010; transform: scale(0.93); box-shadow: 0 0 14px #ff224450; }
     .kalc-sci {
-      background: #0f1a2e; border: 1px solid #1e40af; color: #93c5fd;
+      background: #001218; border: 1px solid #00d4ff40; color: #00d4ff;
       font-size: 0.95rem; font-weight: 800; border-radius: 0.875rem;
-      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s;
+      padding: 1.1rem 0; cursor: pointer; transition: background 0.1s, transform 0.08s, box-shadow 0.1s;
       display: flex; align-items: center; justify-content: center;
     }
-    .kalc-sci:active { background: #1e3a8a; transform: scale(0.93); }
+    .kalc-sci:active { background: #002030; transform: scale(0.93); box-shadow: 0 0 14px #00d4ff40; }
     .kalc-eq {
-      background: linear-gradient(135deg, #d97706, #f59e0b);
-      border: none; color: #000;
+      background: linear-gradient(135deg, #ff2244, #b026ff);
+      border: none; color: #fff;
       font-size: 1.5rem; font-weight: 900; border-radius: 0.875rem;
       padding: 1.1rem 0; cursor: pointer; transition: filter 0.1s, transform 0.08s;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px #f59e0b40;
+      box-shadow: 0 4px 24px #ff224450;
     }
-    .kalc-eq:active { filter: brightness(1.2); transform: scale(0.93); }
+    .kalc-eq:active { filter: brightness(1.25); transform: scale(0.93); }
+
+    /* ══ CYBERPUNK / NEON NOIR DESIGN SYSTEM ═══════════════════ */
+
+    /* Neon glow text utility */
+    .neon-red   { color: #ff2244; text-shadow: 0 0 10px #ff224470; }
+    .neon-purple{ color: #b026ff; text-shadow: 0 0 10px #b026ff70; }
+    .neon-blue  { color: #00d4ff; text-shadow: 0 0 10px #00d4ff70; }
+    .neon-mint  { color: #00ffb3; text-shadow: 0 0 10px #00ffb370; }
+    .neon-yellow{ color: #ffe600; text-shadow: 0 0 10px #ffe60070; }
+
+    /* Panel / card surfaces */
+    .cyber-panel {
+      background: #08000f;
+      border: 1px solid #ff224420;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 40px #ff224408, inset 0 1px 0 #ffffff05;
+    }
+    .cyber-panel-purple {
+      background: #08000f;
+      border: 1px solid #b026ff25;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 32px #b026ff08, inset 0 1px 0 #ffffff05;
+    }
+
+    /* Modal backdrop + box */
+    .cyber-modal-backdrop {
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(10px);
+    }
+    .cyber-modal {
+      background: linear-gradient(160deg, #0d0018 0%, #080010 60%, #0a0008 100%);
+      border: 1px solid #ff224430;
+      border-radius: 1.5rem;
+      box-shadow: 0 0 60px #ff224418, 0 0 120px #b026ff12, inset 0 1px 0 #ffffff06;
+    }
+
+    /* Input / select / textarea fields */
+    .cyber-input {
+      background: #0d0018;
+      border: 1px solid #b026ff30;
+      border-radius: 0.75rem;
+      color: #e2e8f0;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .cyber-input:focus {
+      outline: none;
+      border-color: #b026ff;
+      box-shadow: 0 0 0 2px #b026ff20;
+    }
+
+    /* Primary neon button */
+    .cyber-btn-primary {
+      background: linear-gradient(135deg, #ff2244, #b026ff);
+      color: #fff;
+      font-weight: 900;
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 0 20px #ff224440, 0 0 40px #b026ff18;
+      transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    }
+    .cyber-btn-primary:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 28px #ff224455, 0 0 56px #b026ff28;
+    }
+
+    /* Secondary/ghost button */
+    .cyber-btn-ghost {
+      background: transparent;
+      border: 1px solid #b026ff35;
+      color: #b026ffcc;
+      border-radius: 0.75rem;
+      transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .cyber-btn-ghost:hover {
+      border-color: #b026ff;
+      color: #d580ff;
+      box-shadow: 0 0 10px #b026ff25;
+    }
+
+    /* Divider lines */
+    .cyber-divider { border-color: #ff224418; }
+
+    /* Table header */
+    .cyber-thead {
+      background: #0d000f90;
+      border-bottom: 1px solid #ff224420;
+      color: #00d4ff80;
+    }
+
+    /* Row alternating */
+    .cyber-row {
+      border-bottom: 1px solid #ff224410;
+      transition: background 0.1s;
+    }
+    .cyber-row:hover { background: #ff224406; }
+
+    /* Badge / chip */
+    .cyber-badge-red    { background:#ff224415; color:#ff8099; border:1px solid #ff224430; border-radius:0.5rem; padding:2px 8px; font-size:0.65rem; font-weight:800; }
+    .cyber-badge-purple { background:#b026ff15; color:#d580ff; border:1px solid #b026ff30; border-radius:0.5rem; padding:2px 8px; font-size:0.65rem; font-weight:800; }
+    .cyber-badge-blue   { background:#00d4ff12; color:#00d4ff; border:1px solid #00d4ff30; border-radius:0.5rem; padding:2px 8px; font-size:0.65rem; font-weight:800; }
+    .cyber-badge-mint   { background:#00ffb312; color:#00ffb3; border:1px solid #00ffb330; border-radius:0.5rem; padding:2px 8px; font-size:0.65rem; font-weight:800; }
+
+    /* Scan-line subtle effect on header */
+    #siteHeader::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,34,68,0.015) 2px, rgba(255,34,68,0.015) 4px);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    /* Presensi radio buttons */
+    .absen-radio-wrap { display:flex; justify-content:center; align-items:center; padding:4px; border-radius:0.875rem; width:100%; }
+    .absen-radio-wrap input[type=radio] { display:none; }
+    .absen-radio-wrap input:checked + .absen-label-H { background:#00ffb322; color:#00ffb3; border-color:#00ffb360; text-shadow:0 0 8px #00ffb360; }
+    .absen-radio-wrap input:checked + .absen-label-S { background:#ffe60022; color:#ffe600; border-color:#ffe60060; text-shadow:0 0 8px #ffe60060; }
+    .absen-radio-wrap input:checked + .absen-label-I { background:#00d4ff22; color:#00d4ff; border-color:#00d4ff60; text-shadow:0 0 8px #00d4ff60; }
+    .absen-radio-wrap input:checked + .absen-label-A { background:#ff224422; color:#ff2244; border-color:#ff224460; text-shadow:0 0 8px #ff224460; }
+    .absen-radio-wrap input:checked + .absen-label-B { background:#b026ff22; color:#b026ff; border-color:#b026ff60; text-shadow:0 0 8px #b026ff60; }
+    .absen-label {
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:0.75rem; border-radius:0.6rem;
+      padding:0.5rem 0; cursor:pointer; border:1px solid transparent;
+      color:#444; transition:all 0.15s ease; flex:1; text-align:center;
+    }
 
   </style>
 </head>
 <body class="text-slate-100/90 antialiased min-h-screen flex flex-col justify-between">
 
-  <header id="siteHeader" class="border-b border-red-500/20 bg-black/85 backdrop-blur-md px-4 sm:px-6 py-4 shadow-xl shadow-red-950/20">
+  <header id="siteHeader" class="border-b border-red-500/20 bg-black/90 backdrop-blur-md px-4 sm:px-6 py-4 shadow-xl shadow-red-950/30" style="border-bottom:1px solid #ff224422;box-shadow:0 4px 32px #ff224415,0 1px 0 #ff224420;">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <div class="bg-gradient-to-tr from-red-700 via-purple-600 to-blue-600 text-white p-2.5 rounded-xl shadow-md shadow-purple-500/30 flex items-center justify-center">
+        <div class="text-white p-2.5 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#ff2244,#b026ff,#00d4ff);box-shadow:0 0 18px #ff224450,0 0 32px #b026ff30;">
           <span class="material-icons-sharp text-xl font-bold">auto_stories</span>
         </div>
         <div>
-          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-red-200 to-blue-400 bg-clip-text text-transparent">Presenly</h1>
-          <p class="text-[10px] font-bold text-purple-400 tracking-widest uppercase">Presence & Grade System</p>
+          <h1 class="text-xl font-extrabold tracking-tight" style="background:linear-gradient(90deg,#fff 0%,#ff8099 40%,#00d4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Presenly</h1>
+          <p class="text-[10px] font-bold tracking-widest uppercase" style="color:#b026ff;">Presence & Grade System</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-xs font-bold text-blue-300 bg-blue-500/10 border border-blue-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
-          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+        <span class="text-xs font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style="color:#00d4ff;background:#00d4ff10;border:1px solid #00d4ff30;box-shadow:0 0 10px #00d4ff15;">
+          <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#00ffb3;box-shadow:0 0 6px #00ffb3;"></span>
           <span>Siswa: <span id="jumlahSiswa">0</span></span>
         </span>
       </div>
@@ -146,20 +276,20 @@
 
   <main id="mainContent" class="max-w-7xl mx-auto w-full px-4 sm:px-6 my-4 sm:my-6 flex flex-col gap-6 flex-grow">
     
-    <section class="bg-black/40 border border-purple-500/20 rounded-2xl p-3 shadow-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+    <section class="rounded-2xl p-3 shadow-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4" style="background:#0a0010;border:1px solid #ff224425;box-shadow:0 4px 32px #ff224410;">
       <div class="relative w-full md:w-auto md:min-w-[200px]">
-        <select id="dropdownKelas" onchange="loadSiswa()" class="w-full bg-slate-950 border border-purple-500/30 hover:border-red-400 rounded-xl pl-4 pr-10 py-2.5 text-xs font-bold text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all appearance-none cursor-pointer">
+        <select id="dropdownKelas" onchange="loadSiswa()" class="w-full rounded-xl pl-4 pr-10 py-2.5 text-xs font-bold focus:outline-none transition-all appearance-none cursor-pointer" style="background:#0d0018;border:1px solid #b026ff40;color:#e2e8f0;" onfocus="this.style.borderColor='#ff2244'" onblur="this.style.borderColor='#b026ff40'">
           <option value="">-- Tentukan Kelas --</option>
         </select>
-        <span class="material-icons-sharp absolute right-3 top-2.5 text-purple-400 text-lg pointer-events-none">expand_more</span>
+        <span class="material-icons-sharp absolute right-3 top-2.5 text-lg pointer-events-none" style="color:#b026ff;">expand_more</span>
       </div>
 
-      <div class="flex bg-slate-950 p-1 rounded-xl border border-purple-500/20 w-full md:w-auto">
-        <button onclick="switchTab('presensi')" id="tabBtnPresensi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black">
+      <div class="flex p-1 rounded-xl w-full md:w-auto" style="background:#0a000f;border:1px solid #ff224420;">
+        <button onclick="switchTab('presensi')" id="tabBtnPresensi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-white font-black" style="background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 16px #ff224440;">
           <span class="material-icons-sharp text-sm">fact_check</span>
           <span>Presensi</span>
         </button>
-        <button onclick="switchTab('penilaian')" id="tabBtnPenilaian" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200">
+        <button onclick="switchTab('penilaian')" id="tabBtnPenilaian" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer" style="color:#00d4ff80;">
           <span class="material-icons-sharp text-sm">stars</span>
           <span>Penilaian</span>
         </button>
@@ -168,64 +298,80 @@
     </section>
 
     <!-- ===== SIDEBAR FITUR (collapsible, seperti Atribut Jurnal) ===== -->
-    <div id="fiturPanel" class="bg-black/20 border border-purple-500/20 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-purple-500/20 cursor-pointer select-none" onclick="toggleFiturPanel()">
+    <div id="fiturPanel" class="rounded-3xl shadow-2xl overflow-hidden transition-all duration-300" style="background:#0a0010;border:1px solid #b026ff25;box-shadow:0 4px 32px #b026ff10;">
+      <div class="flex items-center justify-between px-5 py-4 cursor-pointer select-none" onclick="toggleFiturPanel()" style="border-bottom:1px solid #b026ff20;">
         <div class="flex items-center space-x-2">
-          <span class="material-icons-sharp text-sm text-yellow-400">widgets</span>
-          <h2 class="text-xs font-extrabold uppercase text-blue-300 tracking-wider">Fitur Kelas</h2>
+          <span class="material-icons-sharp text-sm" style="color:#ffe600;text-shadow:0 0 8px #ffe60080;">widgets</span>
+          <h2 class="text-xs font-extrabold uppercase tracking-wider" style="color:#00d4ff;">Fitur Kelas</h2>
         </div>
-        <span id="fiturPanelIcon" class="material-icons-sharp text-purple-400/60 text-base transition-transform duration-300" style="transform:rotate(0deg)">expand_less</span>
+        <span id="fiturPanelIcon" class="material-icons-sharp text-base transition-transform duration-300" style="color:#b026ff60;transform:rotate(0deg)">expand_less</span>
       </div>
       <div id="fiturPanelBody" class="transition-all duration-300" style="max-height:0;opacity:0;padding-top:0;padding-bottom:0;overflow:hidden">
         <div class="p-4 grid grid-cols-4 sm:grid-cols-8 gap-2">
           <!-- Timer -->
           <button onclick="toggleTimerModal()" title="Timer"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-red-400 text-xl">timer</span>
-            <span class="text-[9px] font-black text-slate-400">Timer</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #ff224430;"
+            onmouseover="this.style.borderColor='#ff2244';this.style.boxShadow='0 0 12px #ff224435'" onmouseout="this.style.borderColor='#ff224430';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#ff2244;text-shadow:0 0 8px #ff224470;">timer</span>
+            <span class="text-[9px] font-black" style="color:#888;">Timer</span>
           </button>
           <!-- Kelompok -->
           <button onclick="acakKelompok()" title="Kelompok"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-blue-400 text-xl">shuffle</span>
-            <span class="text-[9px] font-black text-slate-400">Kelompok</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #00d4ff30;"
+            onmouseover="this.style.borderColor='#00d4ff';this.style.boxShadow='0 0 12px #00d4ff30'" onmouseout="this.style.borderColor='#00d4ff30';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#00d4ff;text-shadow:0 0 8px #00d4ff70;">shuffle</span>
+            <span class="text-[9px] font-black" style="color:#888;">Kelompok</span>
           </button>
           <!-- Wheel -->
           <button onclick="toggleWheelModal()" title="Wheel Siswa"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-purple-400 text-xl">casino</span>
-            <span class="text-[9px] font-black text-slate-400">Wheel</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #b026ff30;"
+            onmouseover="this.style.borderColor='#b026ff';this.style.boxShadow='0 0 12px #b026ff30'" onmouseout="this.style.borderColor='#b026ff30';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#b026ff;text-shadow:0 0 8px #b026ff70;">casino</span>
+            <span class="text-[9px] font-black" style="color:#888;">Wheel</span>
           </button>
           <!-- Translate -->
           <button onclick="toggleTranslateModal()" title="Translate"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-blue-400 text-xl">translate</span>
-            <span class="text-[9px] font-black text-slate-400">Translate</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #00d4ff30;"
+            onmouseover="this.style.borderColor='#00d4ff';this.style.boxShadow='0 0 12px #00d4ff30'" onmouseout="this.style.borderColor='#00d4ff30';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#00d4ff;text-shadow:0 0 8px #00d4ff70;">translate</span>
+            <span class="text-[9px] font-black" style="color:#888;">Translate</span>
           </button>
           <!-- Jurnal -->
           <button onclick="toggleJurnalModal()" title="Jurnal Pembelajaran"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-emerald-400 text-xl">menu_book</span>
-            <span class="text-[9px] font-black text-slate-400">Jurnal</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #00ffb330;"
+            onmouseover="this.style.borderColor='#00ffb3';this.style.boxShadow='0 0 12px #00ffb330'" onmouseout="this.style.borderColor='#00ffb330';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#00ffb3;text-shadow:0 0 8px #00ffb370;">menu_book</span>
+            <span class="text-[9px] font-black" style="color:#888;">Jurnal</span>
           </button>
           <!-- Kalkulator -->
           <button onclick="_modalToggle('kalkulatorModal')" title="Kalkulator"
-            class="flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-yellow-400 text-xl">calculate</span>
-            <span class="text-[9px] font-black text-slate-400">Kalkulator</span>
+            class="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #ffe60030;"
+            onmouseover="this.style.borderColor='#ffe600';this.style.boxShadow='0 0 12px #ffe60030'" onmouseout="this.style.borderColor='#ffe60030';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#ffe600;text-shadow:0 0 8px #ffe60070;">calculate</span>
+            <span class="text-[9px] font-black" style="color:#888;">Kalkulator</span>
           </button>
           <!-- Inbox -->
           <button onclick="toggleInboxModal()" title="Inbox Tugas Siswa"
-            class="relative flex flex-col items-center justify-center gap-1 bg-slate-950 hover:bg-slate-900 border border-purple-500/20 hover:border-red-400 rounded-xl py-3 transition-all cursor-pointer">
-            <span class="material-icons-sharp text-orange-400 text-xl">inbox</span>
-            <span class="text-[9px] font-black text-slate-400">Inbox</span>
-            <span id="inboxBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-lg">0</span>
+            class="relative flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer"
+            style="background:#0d0010;border:1px solid #ff660030;"
+            onmouseover="this.style.borderColor='#ff6600';this.style.boxShadow='0 0 12px #ff660030'" onmouseout="this.style.borderColor='#ff660030';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#ff6600;text-shadow:0 0 8px #ff660070;">inbox</span>
+            <span class="text-[9px] font-black" style="color:#888;">Inbox</span>
+            <span id="inboxBadge" class="hidden absolute -top-1.5 -right-1.5 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1" style="background:#ff2244;box-shadow:0 0 8px #ff224460;">0</span>
           </button>
           <!-- Nilai Siswa -->
           <button onclick="toggleNilaiModal()" id="btnNilai"
-            class="relative flex flex-col items-center justify-center gap-1 bg-slate-900 hover:bg-indigo-500/10 border border-slate-700 hover:border-indigo-500/50 rounded-xl py-3 transition-all cursor-pointer" title="Rekap Nilai Sumatif">
-            <span class="material-icons-sharp text-indigo-400 text-xl">bar_chart</span>
-            <span class="text-[9px] font-black text-slate-400">Nilai</span>
+            class="relative flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all cursor-pointer" title="Rekap Nilai Sumatif"
+            style="background:#0d0010;border:1px solid #7755ff30;"
+            onmouseover="this.style.borderColor='#7755ff';this.style.boxShadow='0 0 12px #7755ff30'" onmouseout="this.style.borderColor='#7755ff30';this.style.boxShadow='none'">
+            <span class="material-icons-sharp text-xl" style="color:#7755ff;text-shadow:0 0 8px #7755ff70;">bar_chart</span>
+            <span class="text-[9px] font-black" style="color:#888;">Nilai</span>
           </button>
         </div>
       </div>
@@ -233,33 +379,33 @@
 
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-grow">
       
-      <div class="order-2 lg:order-1 lg:col-span-8 bg-black/20 border border-purple-500/20 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-auto min-h-[300px]">
+      <div class="order-2 lg:order-1 lg:col-span-8 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-auto min-h-[300px]" style="background:#08000f;border:1px solid #ff224420;box-shadow:0 4px 40px #ff224408;">
         
-        <div id="loadingSiswa" class="hidden p-16 text-center flex-grow flex flex-col items-center justify-center text-purple-400/60">
-          <div class="animate-spin w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full mb-3"></div>
+        <div id="loadingSiswa" class="hidden p-16 text-center flex-grow flex flex-col items-center justify-center" style="color:#b026ff60;">
+          <div class="animate-spin w-8 h-8 rounded-full mb-3" style="border:3px solid #b026ff;border-top-color:transparent;"></div>
           <p class="text-xs font-semibold tracking-wide">Sinkronisasi data Presenly...</p>
         </div>
 
-        <div id="placeholderSiswa" class="p-16 text-center flex-grow flex flex-col items-center justify-center text-purple-400/40">
-          <div class="bg-slate-950 p-4 rounded-2xl mb-3 border border-purple-500/10 shadow-inner">
-            <span class="material-icons-sharp text-3xl block text-purple-400/40">dns</span>
+        <div id="placeholderSiswa" class="p-16 text-center flex-grow flex flex-col items-center justify-center" style="color:#ff224440;">
+          <div class="p-4 rounded-2xl mb-3" style="background:#0d0010;border:1px solid #ff224420;">
+            <span class="material-icons-sharp text-3xl block" style="color:#ff224440;">dns</span>
           </div>
           <p class="text-xs font-bold">Ruang Kelas Belum Terpilih</p>
         </div>
 
         <div id="tabelContainer" class="hidden flex-col justify-between w-full">
           <div class="w-full">
-            <div class="hidden sm:grid grid-cols-12 border-b border-purple-500/20 bg-slate-950/60 p-4 text-[10px] font-bold uppercase tracking-widest text-blue-400/70">
-              <div class="col-span-5 text-sm">Informasi Siswa</div>
-              <div id="thAksi" class="col-span-7 text-center text-sm">Status Presensi</div>
+            <div class="hidden sm:grid grid-cols-12 p-4 text-[10px] font-bold uppercase tracking-widest" style="border-bottom:1px solid #ff224420;background:#0d000f90;">
+              <div class="col-span-5 text-sm" style="color:#00d4ff80;">Informasi Siswa</div>
+              <div id="thAksi" class="col-span-7 text-center text-sm" style="color:#00d4ff80;">Status Presensi</div>
             </div>
             
-            <div id="listSiswaMaster" class="p-2 sm:p-0 divide-y divide-purple-500/10 space-y-3 sm:space-y-0">
+            <div id="listSiswaMaster" class="p-2 sm:p-0 space-y-3 sm:space-y-0" style="divide-color:#ff224415;">
               </div>
           </div>
           
-          <div class="p-4 bg-slate-950/40 border-t border-purple-500/20 flex justify-end">
-            <button onclick="simpanKeDatabase()" id="btnSimpan" class="w-full sm:w-auto bg-gradient-to-r from-red-700 via-purple-600 to-blue-600 text-white font-black text-xs px-6 py-3.5 rounded-xl shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+          <div class="p-4 flex justify-end" style="background:#0d000f60;border-top:1px solid #ff224420;">
+            <button onclick="simpanKeDatabase()" id="btnSimpan" class="w-full sm:w-auto text-white font-black text-xs px-6 py-3.5 rounded-xl active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer" style="background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 20px #ff224445,0 0 40px #b026ff20;">
               <span class="material-icons-sharp text-base font-bold">cloud_done</span> 
               <span id="btnTextSimpan">Simpan Rekap Presensi</span>
             </button>
@@ -267,52 +413,52 @@
         </div>
       </div>
 
-      <div class="order-1 lg:order-2 lg:col-span-4 bg-black/20 border border-purple-500/20 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300" id="jurnalPanel">
-        <div class="flex items-center justify-between p-5 border-b border-purple-500/20 cursor-pointer select-none" onclick="toggleJurnalPanel()">
+      <div class="order-1 lg:order-2 lg:col-span-4 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300" id="jurnalPanel" style="background:#08000f;border:1px solid #b026ff25;box-shadow:0 4px 32px #b026ff08;">
+        <div class="flex items-center justify-between p-5 cursor-pointer select-none" onclick="toggleJurnalPanel()" style="border-bottom:1px solid #b026ff20;">
           <div class="flex items-center space-x-2">
-            <span class="material-icons-sharp text-sm text-red-400">edit_note</span>
-            <h2 class="text-xs font-extrabold uppercase text-blue-300 tracking-wider">Atribut Jurnal</h2>
+            <span class="material-icons-sharp text-sm" style="color:#ff2244;text-shadow:0 0 8px #ff224460;">edit_note</span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider" style="color:#00d4ff;">Atribut Jurnal</h2>
           </div>
-          <span id="jurnalPanelIcon" class="material-icons-sharp text-purple-400/60 text-base transition-transform duration-300" style="transform:rotate(180deg)">expand_less</span>
+          <span id="jurnalPanelIcon" class="material-icons-sharp text-base transition-transform duration-300" style="color:#b026ff60;transform:rotate(180deg)">expand_less</span>
         </div>
         <div id="jurnalPanelBody" class="p-5 space-y-4 transition-all duration-300" style="max-height:0;opacity:0;padding-top:0;padding-bottom:0;overflow:hidden">
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-red-300/80">Materi Pokok</label>
+            <label class="block text-xs font-bold" style="color:#ff224490;">Materi Pokok</label>
             <div class="relative">
-              <span class="material-icons-sharp absolute left-3 top-2.5 text-purple-400/60 text-base">menu_book</span>
-              <input type="text" id="materi" placeholder="Materi diajarkan..." class="w-full bg-slate-950 border border-purple-500/20 rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all">
+              <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#b026ff60;">menu_book</span>
+              <input type="text" id="materi" placeholder="Materi diajarkan..." class="w-full rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium focus:outline-none transition-all" style="background:#0d0018;border:1px solid #b026ff25;color:#e2e8f0;" onfocus="this.style.borderColor='#b026ff'" onblur="this.style.borderColor='#b026ff25'">
             </div>
           </div>
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-purple-300/80">JP & Jenis Penilaian</label>
+            <label class="block text-xs font-bold" style="color:#b026ff90;">JP & Jenis Penilaian</label>
             <div class="flex gap-2">
               <div class="relative flex-1">
-                <span class="material-icons-sharp absolute left-3 top-2.5 text-purple-400/60 text-base">schedule</span>
-                <input type="number" id="jp" min="1" max="12" value="2" placeholder="JP" title="Jam Pelajaran" class="w-full bg-slate-950 border border-purple-500/20 rounded-xl pl-9 pr-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#b026ff60;">schedule</span>
+                <input type="number" id="jp" min="1" max="12" value="2" placeholder="JP" title="Jam Pelajaran" class="w-full rounded-xl pl-9 pr-3 py-2.5 text-xs font-medium focus:outline-none transition-all" style="background:#0d0018;border:1px solid #b026ff25;color:#e2e8f0;" onfocus="this.style.borderColor='#b026ff'" onblur="this.style.borderColor='#b026ff25'">
               </div>
               <div class="relative flex-1">
-                <span class="material-icons-sharp absolute left-3 top-2.5 text-yellow-500/50 text-base">tag</span>
-                <select id="jnGlobal" onchange="terapkanJNGlobal(this.value)" title="Jenis Penilaian" class="w-full bg-slate-950 border border-yellow-500/20 hover:border-yellow-400 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-yellow-300 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all appearance-none cursor-pointer">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#ffe60050;">tag</span>
+                <select id="jnGlobal" onchange="terapkanJNGlobal(this.value)" title="Jenis Penilaian" class="w-full rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold focus:outline-none transition-all appearance-none cursor-pointer" style="background:#0d0018;border:1px solid #ffe60025;color:#ffe600;">
                   <option value="1">Sumatif 1</option>
                   <option value="2">Sumatif 2</option>
                   <option value="3">Sumatif 3</option>
                 </select>
               </div>
             </div>
-            <p class="text-[9px] text-slate-500 font-medium italic">JN mengisi semua siswa sekaligus</p>
+            <p class="text-[9px] font-medium italic" style="color:#555;">JN mengisi semua siswa sekaligus</p>
           </div>
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-blue-300/80">Catatan Kejadian</label>
-            <textarea id="catatan" rows="3" placeholder="Siswa aktif, hambatan kelas, dll..." class="w-full bg-slate-950 border border-purple-500/20 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all resize-none"></textarea>
+            <label class="block text-xs font-bold" style="color:#00d4ff90;">Catatan Kejadian</label>
+            <textarea id="catatan" rows="3" placeholder="Siswa aktif, hambatan kelas, dll..." class="w-full rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-all resize-none" style="background:#0d0018;border:1px solid #b026ff25;color:#e2e8f0;" onfocus="this.style.borderColor='#00d4ff'" onblur="this.style.borderColor='#b026ff25'"></textarea>
           </div>
           <div class="space-y-1.5">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-yellow-300/80">Keterangan</label>
-              <span class="text-[10px] text-slate-500 font-medium italic">Kosong = otomatis siswa tidak hadir</span>
+              <label class="block text-xs font-bold" style="color:#ffe60090;">Keterangan</label>
+              <span class="text-[10px] font-medium italic" style="color:#555;">Kosong = otomatis siswa tidak hadir</span>
             </div>
             <div class="relative">
-              <span class="material-icons-sharp absolute left-3 top-2.5 text-yellow-500/50 text-base">info</span>
-              <input type="text" id="keterangan" placeholder="Kosongkan untuk otomatis..." class="w-full bg-slate-950 border border-yellow-500/20 rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-all">
+              <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#ffe60050;">info</span>
+              <input type="text" id="keterangan" placeholder="Kosongkan untuk otomatis..." class="w-full rounded-xl pl-9 pr-4 py-2.5 text-xs font-medium focus:outline-none transition-all" style="background:#0d0018;border:1px solid #ffe60025;color:#e2e8f0;" onfocus="this.style.borderColor='#ffe600'" onblur="this.style.borderColor='#ffe60025'">
             </div>
           </div>
         </div>
@@ -321,24 +467,24 @@
     </section>
   </main>
 
-  <footer class="text-center py-4 text-[11px] font-bold text-purple-600/40 border-t border-purple-500/10 max-w-7xl mx-auto w-full px-6">
+  <footer class="text-center py-4 text-[11px] font-bold max-w-7xl mx-auto w-full px-6" style="color:#ff224430;border-top:1px solid #ff224415;">
     &copy; 2026 Presenly &bull; Premium Gold Solid Framework
   </footer>
 
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0"></div>
 
   <div id="timerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-sm w-full p-5 m-4 relative">
-      <button onclick="toggleTimerModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+    <div class="cyber-modal modal-box max-w-sm w-full p-5 m-4 relative">
+      <button onclick="toggleTimerModal()" class="absolute top-4 right-4 p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
         <span class="material-icons-sharp block text-base">close</span>
       </button>
 
       <!-- Tab switcher -->
       <div class="flex gap-1 mb-4">
-        <button onclick="switchTimerTab('timer')" id="tTabBtnTimer" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md">
+        <button onclick="switchTimerTab('timer')" id="tTabBtnTimer" class="cyber-btn-primary flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider cursor-pointer">
           <span class="material-icons-sharp text-sm">timer</span> Timer
         </button>
-        <button onclick="switchTimerTab('stopwatch')" id="tTabBtnSW" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-blue-400/70 hover:text-blue-200 border border-blue-500/20">
+        <button onclick="switchTimerTab('stopwatch')" id="tTabBtnSW" class="cyber-btn-ghost flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider cursor-pointer">
           <span class="material-icons-sharp text-sm">timer_off</span> Stopwatch
         </button>
       </div>
@@ -346,34 +492,34 @@
       <!-- ══ TAB TIMER ══ -->
       <div id="tPanelTimer" class="space-y-4 text-center">
         <div class="text-red-300 font-extrabold text-[10px] tracking-widest uppercase">Timer Aktivitas</div>
-        <div id="timerDisplay" class="text-5xl font-extrabold tracking-tight text-blue-300 font-mono py-5 bg-black rounded-2xl border border-purple-500/10 shadow-inner">05:00</div>
+        <div id="timerDisplay" class="text-5xl font-extrabold tracking-tight font-mono py-5 rounded-2xl text-center" style="color:#00d4ff;text-shadow:0 0 20px #00d4ff60;background:#08000f;border:1px solid #00d4ff20;">05:00</div>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="flex flex-col gap-1.5 bg-black/40 p-2 rounded-xl border border-slate-900">
+          <div class="flex flex-col gap-1.5 p-2 rounded-xl" style="background:#0d000f;border:1px solid #ff224420;">
             <span class="text-[10px] font-bold text-slate-500 uppercase">Kurangi Waktu</span>
             <div class="flex gap-1 justify-center">
-              <button onclick="modifyTimer(-60)" class="bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">-1m</button>
-              <button onclick="modifyTimer(-300)" class="bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">-5m</button>
+              <button onclick="modifyTimer(-60)" class="font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer" style="background:#1a0008;border:1px solid #ff224440;color:#ff8099;">-1m</button>
+              <button onclick="modifyTimer(-300)" class="font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer" style="background:#1a0008;border:1px solid #ff224440;color:#ff8099;">-5m</button>
             </div>
           </div>
-          <div class="flex flex-col gap-1.5 bg-black/40 p-2 rounded-xl border border-slate-900">
+          <div class="flex flex-col gap-1.5 p-2 rounded-xl" style="background:#0d000f;border:1px solid #ff224420;">
             <span class="text-[10px] font-bold text-slate-500 uppercase">Tambah Waktu</span>
             <div class="flex gap-1 justify-center">
-              <button onclick="modifyTimer(60)" class="bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">+1m</button>
-              <button onclick="modifyTimer(300)" class="bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer">+5m</button>
+              <button onclick="modifyTimer(60)" class="font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer" style="background:#001a0a;border:1px solid #00ffb340;color:#00ffb3;">+1m</button>
+              <button onclick="modifyTimer(300)" class="font-bold px-2 py-1 rounded-lg flex-1 cursor-pointer" style="background:#001a0a;border:1px solid #00ffb340;color:#00ffb3;">+5m</button>
             </div>
           </div>
         </div>
         <div class="flex justify-center gap-2.5 pt-1">
-          <button onclick="startTimer()" class="bg-gradient-to-r from-red-600 to-purple-600 text-white p-3.5 rounded-xl shadow-lg active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base font-bold">play_arrow</span></button>
-          <button onclick="pauseTimer()" class="bg-black hover:bg-slate-900 text-blue-400 p-3.5 rounded-xl border border-blue-500/20 active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base">pause</span></button>
-          <button onclick="resetTimer()" class="bg-slate-900 text-white p-3.5 rounded-xl active:scale-90 cursor-pointer"><span class="material-icons-sharp text-base">refresh</span></button>
+          <button onclick="startTimer()" class="cyber-btn-primary p-3.5 rounded-xl cursor-pointer"><span class="material-icons-sharp text-base font-bold">play_arrow</span></button>
+          <button onclick="pauseTimer()" class="cyber-btn-ghost p-3.5 rounded-xl cursor-pointer" style="color:#00d4ff;border-color:#00d4ff30;"><span class="material-icons-sharp text-base">pause</span></button>
+          <button onclick="resetTimer()" class="p-3.5 rounded-xl cursor-pointer" style="background:#1a0018;border:1px solid #b026ff30;color:#b026ff;"><span class="material-icons-sharp text-base">refresh</span></button>
         </div>
       </div>
 
       <!-- ══ TAB STOPWATCH ══ -->
       <div id="tPanelSW" class="hidden space-y-4 text-center">
         <div class="text-blue-300 font-extrabold text-[10px] tracking-widest uppercase">Stopwatch</div>
-        <div id="swDisplay" class="text-5xl font-extrabold tracking-tight text-emerald-300 font-mono py-5 bg-black rounded-2xl border border-emerald-500/10 shadow-inner">00:00<span class="text-2xl text-emerald-500/60">.00</span></div>
+        <div id="swDisplay" class="text-5xl font-extrabold tracking-tight font-mono py-5 rounded-2xl text-center" style="color:#00ffb3;text-shadow:0 0 20px #00ffb360;background:#08000f;border:1px solid #00ffb320;">00:00<span class="text-2xl text-emerald-500/60">.00</span></div>
 
         <!-- Lap list -->
         <div id="swLapList" class="hidden max-h-36 overflow-y-auto bg-black/40 rounded-xl border border-emerald-500/10 text-left px-3 py-2 space-y-1"></div>
@@ -398,8 +544,8 @@
   </div>
 
   <div id="kelompokModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-2xl w-full p-5 m-4 max-h-[85vh] flex flex-col relative">
-      <button onclick="toggleKelompokModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+    <div class="cyber-modal modal-box max-w-2xl w-full p-5 m-4 max-h-[85vh] flex flex-col relative">
+      <button onclick="toggleKelompokModal()" class="absolute top-4 right-4 p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
         <span class="material-icons-sharp block text-base">close</span>
       </button>
       <div class="flex items-center space-x-2 mb-4">
@@ -422,8 +568,8 @@
 
   <!-- ===== WHEEL MODAL ===== -->
   <div id="wheelModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-purple-500/30 max-w-md w-full p-5 m-4 relative flex flex-col items-center gap-4">
-      <button onclick="toggleWheelModal()" class="absolute top-4 right-4 text-purple-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+    <div class="cyber-modal modal-box max-w-md w-full p-5 m-4 relative flex flex-col items-center gap-4">
+      <button onclick="toggleWheelModal()" class="absolute top-4 right-4 p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
         <span class="material-icons-sharp block text-base">close</span>
       </button>
       <div class="flex items-center gap-2">
@@ -437,10 +583,10 @@
         <p id="wheelResultText" class="text-lg font-extrabold text-white"></p>
       </div>
       <div class="flex gap-3 w-full">
-        <button onclick="putarWheel()" id="btnPutarWheel" class="flex-1 bg-gradient-to-r from-red-600 to-purple-600 text-white font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all">
+        <button onclick="putarWheel()" id="btnPutarWheel" class="cyber-btn-primary flex-1 font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
           <span class="material-icons-sharp text-base">rotate_right</span> Putar!
         </button>
-        <button onclick="acakUlangWheel()" class="bg-slate-900 border border-purple-500/20 text-purple-300 font-bold text-xs py-3 px-4 rounded-xl cursor-pointer hover:border-purple-400 transition-all">
+        <button onclick="acakUlangWheel()" class="cyber-btn-ghost font-bold text-xs py-3 px-4 rounded-xl cursor-pointer">
           <span class="material-icons-sharp text-base">refresh</span>
         </button>
       </div>
@@ -450,8 +596,8 @@
 
   <!-- ===== TRANSLATE MODAL ===== -->
   <div id="translateModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-blue-500/30 max-w-lg w-full p-5 m-4 relative flex flex-col gap-4">
-      <button onclick="toggleTranslateModal()" class="absolute top-4 right-4 text-blue-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+    <div class="cyber-modal modal-box max-w-lg w-full p-5 m-4 relative flex flex-col gap-4">
+      <button onclick="toggleTranslateModal()" class="absolute top-4 right-4 p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
         <span class="material-icons-sharp block text-base">close</span>
       </button>
       <div class="flex items-center gap-2">
@@ -459,7 +605,7 @@
         <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Translate Teks</h3>
       </div>
       <div class="flex items-center gap-2 bg-black/40 rounded-xl p-2 border border-blue-500/10">
-        <select id="translateFrom" class="flex-1 bg-slate-900 border border-blue-500/20 rounded-lg px-3 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+        <select id="translateFrom" class="cyber-input flex-1 px-3 py-2 text-xs font-bold appearance-none cursor-pointer" style="border-color:#00d4ff25;color:#e2e8f0;">
           <option value="id">🇮🇩 Indonesia</option>
           <option value="en">🇬🇧 English</option>
           <option value="ar">🇸🇦 Arab</option>
@@ -473,7 +619,7 @@
         <button onclick="swapLang()" class="text-purple-400 hover:text-red-300 p-2 cursor-pointer transition-all">
           <span class="material-icons-sharp text-base">swap_horiz</span>
         </button>
-        <select id="translateTo" class="flex-1 bg-slate-900 border border-blue-500/20 rounded-lg px-3 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+        <select id="translateTo" class="cyber-input flex-1 px-3 py-2 text-xs font-bold appearance-none cursor-pointer" style="border-color:#00d4ff25;color:#e2e8f0;">
           <option value="en">🇬🇧 English</option>
           <option value="id">🇮🇩 Indonesia</option>
           <option value="ar">🇸🇦 Arab</option>
@@ -488,7 +634,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div class="flex flex-col gap-1.5">
           <label class="text-[10px] font-bold text-blue-400/70 uppercase tracking-widest">Teks Sumber</label>
-          <textarea id="translateInput" rows="5" placeholder="Ketik teks di sini..." class="w-full bg-black border border-blue-500/20 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all resize-none"></textarea>
+          <textarea id="translateInput" rows="5" placeholder="Ketik teks di sini..." class="cyber-input w-full px-3 py-2.5 text-xs font-medium resize-none" style="min-height:100px;border-color:#00d4ff20;"></textarea>
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-[10px] font-bold text-purple-400/70 uppercase tracking-widest">Hasil Terjemahan</label>
@@ -496,10 +642,10 @@
         </div>
       </div>
       <div class="flex gap-3">
-        <button onclick="doTranslate()" id="btnTranslate" class="flex-1 bg-gradient-to-r from-blue-700 to-purple-600 text-white font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all">
+        <button onclick="doTranslate()" id="btnTranslate" class="cyber-btn-primary flex-1 font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
           <span class="material-icons-sharp text-base">translate</span> Terjemahkan
         </button>
-        <button onclick="copyTranslation()" class="bg-slate-900 border border-blue-500/20 text-blue-300 font-bold text-xs py-3 px-4 rounded-xl cursor-pointer hover:border-blue-400 transition-all" title="Salin hasil">
+        <button onclick="copyTranslation()" class="cyber-btn-ghost font-bold text-xs py-3 px-4 rounded-xl cursor-pointer" title="Salin hasil" style="color:#00d4ff;border-color:#00d4ff30;">
           <span class="material-icons-sharp text-base">content_copy</span>
         </button>
       </div>
@@ -508,7 +654,7 @@
 
   <!-- ===== JURNAL MODAL ===== -->
   <div id="jurnalModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-emerald-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+    <div class="cyber-modal modal-box max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
 
       <!-- Header -->
       <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
@@ -516,7 +662,7 @@
           <span class="material-icons-sharp text-emerald-400 text-lg">menu_book</span>
           <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Jurnal Pembelajaran</h3>
         </div>
-        <button onclick="toggleJurnalModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <button onclick="toggleJurnalModal()" class="p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
           <span class="material-icons-sharp block text-base">close</span>
         </button>
       </div>
@@ -720,7 +866,7 @@
     </div>
   </div>
   <div id="inboxModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-orange-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+    <div class="cyber-modal modal-box max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
 
       <!-- Header -->
       <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
@@ -729,7 +875,7 @@
           <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Inbox Tugas Siswa</h3>
           <span id="inboxTotalBadge" class="hidden text-[10px] font-black bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-full">0 tugas</span>
         </div>
-        <button onclick="toggleInboxModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <button onclick="toggleInboxModal()" class="p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
           <span class="material-icons-sharp block text-base">close</span>
         </button>
       </div>
@@ -822,7 +968,7 @@
 
   <!-- ===== KALKULATOR MODAL ===== -->
   <div id="kalkulatorModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-yellow-500/30 w-full max-w-md m-4 relative overflow-hidden">
+    <div class="cyber-modal modal-box w-full max-w-md m-4 relative overflow-hidden">
 
       <button onclick="_modalToggle('kalkulatorModal')" class="absolute top-4 right-4 text-yellow-400/50 hover:text-red-300 p-1 rounded-xl cursor-pointer z-10">
         <span class="material-icons-sharp text-base">close</span>
@@ -913,7 +1059,7 @@
 
   <!-- ===== NILAI SUMATIF MODAL ===== -->
   <div id="nilaiModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-indigo-500/30 max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
+    <div class="cyber-modal modal-box max-w-5xl w-full m-4 relative flex flex-col" style="max-height:92vh">
 
       <!-- Header -->
       <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
@@ -921,7 +1067,7 @@
           <span class="material-icons-sharp text-indigo-400 text-lg">bar_chart</span>
           <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Rekap Nilai Sumatif</h3>
         </div>
-        <button onclick="toggleNilaiModal()" class="text-slate-400/60 hover:text-red-300 p-1 rounded-xl cursor-pointer">
+        <button onclick="toggleNilaiModal()" class="p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
           <span class="material-icons-sharp block text-base">close</span>
         </button>
       </div>
@@ -1003,7 +1149,7 @@
   <!-- ===== SUCCESS POPUP ===== -->
   <div id="successPopup" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] flex items-center justify-center hidden">
     <canvas id="konfettiCanvas" class="fixed inset-0 pointer-events-none z-[59]" style="width:100%;height:100%"></canvas>
-    <div class="modal-box bg-slate-950 rounded-3xl shadow-2xl border border-emerald-500/30 max-w-sm w-full p-7 m-4 relative text-center flex flex-col items-center gap-5">
+    <div class="cyber-modal modal-box max-w-sm w-full p-7 m-4 relative text-center flex flex-col items-center gap-5">
 
       <!-- Ikon centang animasi -->
       <div class="relative flex items-center justify-center">
@@ -1192,11 +1338,11 @@
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
-      let bgClass = 'bg-slate-900 border-emerald-500/40 text-emerald-300';
-      let icon = 'check_circle';
-      if (type === 'error')   { bgClass = 'bg-slate-900 border-rose-500/40 text-rose-300'; icon = 'error_outline'; }
-      else if (type === 'warning') { bgClass = 'bg-slate-900 border-purple-500/40 text-purple-300'; icon = 'warning_amber'; }
-      toast.className = `toast-enter flex items-center gap-3 p-4 border rounded-2xl shadow-2xl backdrop-blur-md bg-opacity-95 ${bgClass}`;
+      let borderColor = '#00ffb350'; let textColor = '#00ffb3'; let icon = 'check_circle';
+      if (type === 'error')   { borderColor = '#ff224450'; textColor = '#ff8099'; icon = 'error_outline'; }
+      else if (type === 'warning') { borderColor = '#b026ff50'; textColor = '#d580ff'; icon = 'warning_amber'; }
+      toast.className = `toast-enter flex items-center gap-3 p-4 rounded-2xl shadow-2xl`;
+      toast.style.cssText = `background:#0d0018;border:1px solid ${borderColor};color:${textColor};box-shadow:0 4px 24px ${borderColor};`;
       toast.innerHTML = `<span class="material-icons-sharp text-lg">${icon}</span><div class="text-xs font-bold tracking-wide flex-1">${message}</div>`;
       container.appendChild(toast);
       setTimeout(() => {
@@ -1236,13 +1382,13 @@
       let btnTextSimpan = document.getElementById('btnTextSimpan');
 
       if (currentTab === 'presensi') {
-        btnPresensi.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black";
-        btnPenilaian.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200";
+        btnPresensi.style.cssText = "background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 16px #ff224440;color:#fff;";
+        btnPenilaian.style.cssText = "background:transparent;color:#00d4ff80;box-shadow:none;";
         if(thAksi) thAksi.innerText = "Status Presensi";
         btnTextSimpan.innerText = "Simpan Rekap Presensi";
       } else {
-        btnPenilaian.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-red-600 to-purple-600 text-white shadow-md font-black";
-        btnPresensi.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all duration-150 cursor-pointer text-blue-400/70 hover:text-blue-200";
+        btnPenilaian.style.cssText = "background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 16px #ff224440;color:#fff;";
+        btnPresensi.style.cssText = "background:transparent;color:#00d4ff80;box-shadow:none;";
         if(thAksi) thAksi.innerText = "Nilai & JN";
         btnTextSimpan.innerText = "Simpan Rekap Penilaian";
       }
@@ -1315,29 +1461,29 @@
         let currentJN     = localJNState[index] !== undefined ? localJNState[index] : 1;
 
         let rowElement = document.createElement('div');
-        rowElement.className = "sm:grid grid-cols-12 items-center p-4 sm:py-4 divide-y divide-purple-500/5 sm:divide-y-0 bg-slate-950/20 sm:bg-transparent border border-purple-500/10 sm:border-none rounded-xl sm:rounded-none space-y-3 sm:space-y-0";
+        rowElement.className = "cyber-row sm:grid grid-cols-12 items-center p-3 sm:py-3 space-y-3 sm:space-y-0";
         
         let aksiContainerHtml = currentTab === 'presensi' ? `
-          <div class="flex justify-center items-center p-1 bg-black rounded-xl w-full max-w-sm mx-auto border border-purple-500/20 mt-2 sm:mt-0 shadow-inner">
+          <div class="absen-radio-wrap" style="background:#08000f;border:1px solid #ff224420;">
             ${['H','S','I','A','B'].map(st => `
-              <label class="cursor-pointer flex-1 text-center select-none">
-                <input type="radio" name="master_absen_${index}" value="${st}" ${st === currentStatus ? 'checked' : ''} onchange="updateAbsenArray(${index}, '${st}')" class="sr-only peer">
-                <div class="text-xs sm:text-sm font-black py-2.5 rounded-lg text-slate-400 transition-all duration-150 hover:text-blue-200 ${colorMap[st]}">${st}</div>
+              <label class="flex-1">
+                <input type="radio" name="master_absen_${index}" value="${st}" ${st === currentStatus ? 'checked' : ''} onchange="updateAbsenArray(${index}, '${st}')">
+                <div class="absen-label absen-label-${st}">${st}</div>
               </label>
             `).join('')}
           </div>
         ` : `
           <div class="flex items-center justify-between sm:justify-center gap-2 pt-2 sm:pt-0">
-            <span class="text-xs font-bold text-purple-400/50 block sm:hidden">Input Nilai:</span>
+            <span class="text-xs font-bold block sm:hidden" style="color:#b026ff50;">Input Nilai:</span>
             <div class="flex items-center gap-2">
               <div class="flex items-center gap-1.5">
-                <input type="number" id="input_nilai_${index}" value="${currentNilai}" onclick="this.select()" oninput="updateNilaiArray(${index}, this.value)" class="w-20 text-center font-black bg-black border-2 border-purple-500/30 focus:border-blue-400 rounded-xl py-2 text-base text-blue-300 focus:outline-none transition-all">
-                <span class="text-xs font-bold text-blue-400/40">Poin</span>
+                <input type="number" id="input_nilai_${index}" value="${currentNilai}" onclick="this.select()" oninput="updateNilaiArray(${index}, this.value)" class="cyber-input w-20 text-center font-black py-2 text-base focus:outline-none" style="color:#00d4ff;border-color:#00d4ff30;">
+                <span class="text-xs font-bold" style="color:#00d4ff40;">Poin</span>
               </div>
               <div class="flex flex-col items-center gap-0.5 shrink-0">
-                <span class="text-[9px] font-black text-yellow-400/70 uppercase tracking-widest">JN</span>
+                <span class="text-[9px] font-black uppercase tracking-widest" style="color:#ffe60070;">JN</span>
                 <select id="jn_${index}" onchange="updateJNArray(${index}, this.value)"
-                  class="bg-black border border-yellow-500/30 hover:border-yellow-400 text-yellow-300 font-black text-xs rounded-xl px-2 py-2 focus:outline-none focus:ring-1 focus:ring-yellow-500 cursor-pointer appearance-none text-center w-12">
+                  class="cyber-input font-black text-xs px-2 py-2 cursor-pointer appearance-none text-center w-12" style="color:#ffe600;border-color:#ffe60030;">
                   <option value="1" ${currentJN==1?'selected':''}>1</option>
                   <option value="2" ${currentJN==2?'selected':''}>2</option>
                   <option value="3" ${currentJN==3?'selected':''}>3</option>
@@ -1349,8 +1495,8 @@
 
         rowElement.innerHTML = `
           <div class="col-span-5 pb-1 sm:pb-0">
-            <div class="text-sm sm:text-lg font-bold text-slate-100/90 tracking-wide">${siswaObj.nama}</div>
-            <div class="text-xs text-purple-400/40 font-bold mt-1 tracking-wider">NIS: ${siswaObj.nis}</div>
+            <div class="text-sm sm:text-base font-bold tracking-wide" style="color:#e2e8f0;">${siswaObj.nama}</div>
+            <div class="text-xs font-bold mt-0.5 tracking-wider" style="color:#b026ff40;">NIS: ${siswaObj.nis}</div>
           </div>
           <div class="col-span-7">
             ${aksiContainerHtml}
@@ -2297,7 +2443,7 @@
     let wheelSpinning = false;
     let wheelAngle = 0;
     let wheelNames = [];
-    const wheelColors = ['#7c3aed','#dc2626','#2563eb','#9333ea','#b91c1c','#1d4ed8','#6d28d9','#991b1b','#1e40af'];
+    const wheelColors = ['#ff2244','#b026ff','#00d4ff','#00ffb3','#ffe600','#ff0066','#7755ff','#ff6600','#00ff88'];
 
     function toggleWheelModal() {
       let modal = document.getElementById('wheelModal');
