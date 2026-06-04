@@ -1363,6 +1363,27 @@
         showToast("Koneksi database Presenly terhubung.", "success");
         setTimeout(autoCheckInbox, 1500);
         initJNGlobal();
+
+        // ── RESTORE STATE: Kembali ke kelas & tab terakhir sebelum buka link ──
+        try {
+          let savedState = JSON.parse(localStorage.getItem('presenly_last_state') || 'null');
+          if (savedState && savedState.kelas) {
+            let select = document.getElementById('dropdownKelas');
+            select.value = savedState.kelas;
+            if (select.value === savedState.kelas) {
+              // Restore tab dulu sebelum loadSiswa
+              if (savedState.tab && savedState.tab !== currentTab) {
+                currentTab = savedState.tab;
+              }
+              loadSiswa();
+              // Buka inbox otomatis jika sebelumnya inbox terbuka
+              if (savedState.inboxOpen) {
+                setTimeout(function() { toggleInboxModal(); }, 800);
+              }
+            }
+            localStorage.removeItem('presenly_last_state');
+          }
+        } catch(e) {}
       }).getDaftarKelas();
 
 
@@ -1916,7 +1937,7 @@
         let linkUrl = r.linkFile || r.linkTugas || '';
         let aksiBtns = linkUrl
           ? `<div class="flex gap-1 justify-center">
-               <a href="${linkUrl}" target="_blank" class="flex items-center gap-0.5 px-2 py-1 bg-orange-500/20 hover:bg-orange-500/40 border border-orange-500/30 text-orange-300 font-bold rounded-lg cursor-pointer transition-all text-[10px]">
+               <a href="${linkUrl}" target="_blank" onclick="saveStateBeforeLink()" class="flex items-center gap-0.5 px-2 py-1 bg-orange-500/20 hover:bg-orange-500/40 border border-orange-500/30 text-orange-300 font-bold rounded-lg cursor-pointer transition-all text-[10px]">
                  <span class="material-icons-sharp text-xs">open_in_new</span> Buka
                </a>
              </div>`
@@ -1943,6 +1964,18 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // ── Simpan state sebelum buka link eksternal ──
+    function saveStateBeforeLink() {
+      try {
+        let state = {
+          kelas    : document.getElementById('dropdownKelas').value,
+          tab      : currentTab,
+          inboxOpen: !document.getElementById('inboxModal').classList.contains('hidden')
+        };
+        localStorage.setItem('presenly_last_state', JSON.stringify(state));
+      } catch(e) {}
     }
 
     // Auto-load inbox badge saat halaman siap
