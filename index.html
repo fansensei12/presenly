@@ -1368,18 +1368,13 @@
         try {
           let savedState = JSON.parse(localStorage.getItem('presenly_last_state') || 'null');
           if (savedState && savedState.kelas) {
-            let select = document.getElementById('dropdownKelas');
-            select.value = savedState.kelas;
-            if (select.value === savedState.kelas) {
-              // Restore tab dulu sebelum loadSiswa
+            let sel = document.getElementById('dropdownKelas');
+            sel.value = savedState.kelas;
+            if (sel.value === savedState.kelas) {
               if (savedState.tab && savedState.tab !== currentTab) {
                 currentTab = savedState.tab;
               }
               loadSiswa();
-              // Buka inbox otomatis jika sebelumnya inbox terbuka
-              if (savedState.inboxOpen) {
-                setTimeout(function() { toggleInboxModal(); }, 800);
-              }
             }
             localStorage.removeItem('presenly_last_state');
           }
@@ -1773,10 +1768,41 @@
       }
     }
 
-    // Saat kembali dari tab lain (buka link), refresh data tapi pertahankan filter kelas
+    // Saat kembali dari tab lain (buka link), restore filter inbox dari state tersimpan
     document.addEventListener('visibilitychange', function() {
+      if (document.hidden) return;
       let modal = document.getElementById('inboxModal');
-      if (!document.hidden && modal && !modal.classList.contains('hidden')) {
+      let inboxTerbuka = modal && !modal.classList.contains('hidden');
+
+      try {
+        let savedState = JSON.parse(localStorage.getItem('presenly_last_state') || 'null');
+        if (savedState) {
+          // Restore kelas utama jika belum ter-load (web2apk kadang tidak full reload)
+          if (savedState.kelas) {
+            let sel = document.getElementById('dropdownKelas');
+            if (sel.value !== savedState.kelas) {
+              sel.value = savedState.kelas;
+              if (sel.value === savedState.kelas) {
+                if (savedState.tab && savedState.tab !== currentTab) currentTab = savedState.tab;
+                loadSiswa();
+              }
+            }
+          }
+          localStorage.removeItem('presenly_last_state');
+
+          // Jika inbox sedang terbuka, refresh + terapkan filter kelas yang tersimpan
+          if (inboxTerbuka) {
+            let filterKelas = savedState.inboxFilterKelas || '';
+            let filterMode  = savedState.inboxFilterMode  || '';
+            let filterCari  = savedState.inboxSearch      || '';
+            loadInboxSilent(filterKelas, filterMode, filterCari);
+            return;
+          }
+        }
+      } catch(e) {}
+
+      // Fallback: inbox terbuka tanpa state tersimpan → refresh pertahankan filter lama
+      if (inboxTerbuka) {
         let savedKelas = document.getElementById('inboxFilterKelas').value;
         let savedMode  = document.getElementById('inboxFilterMode').value;
         let savedCari  = document.getElementById('inboxSearch').value;
@@ -1970,9 +1996,11 @@
     function saveStateBeforeLink() {
       try {
         let state = {
-          kelas    : document.getElementById('dropdownKelas').value,
-          tab      : currentTab,
-          inboxOpen: !document.getElementById('inboxModal').classList.contains('hidden')
+          kelas         : document.getElementById('dropdownKelas').value,
+          tab           : currentTab,
+          inboxFilterKelas : document.getElementById('inboxFilterKelas').value,
+          inboxFilterMode  : document.getElementById('inboxFilterMode').value,
+          inboxSearch      : document.getElementById('inboxSearch').value
         };
         localStorage.setItem('presenly_last_state', JSON.stringify(state));
       } catch(e) {}
