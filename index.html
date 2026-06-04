@@ -1745,13 +1745,43 @@
       modal.classList.toggle('hidden');
       document.body.style.overflow = isHiding ? '' : 'hidden';
       if (!isHiding) {
-        // Tandai semua tugas yang ada sekarang sebagai "sudah dibaca"
         simpanInboxSudahDibaca();
-        // Sembunyikan badge
         let badge = document.getElementById('inboxBadge');
         badge.classList.add('hidden');
         loadInbox();
       }
+    }
+
+    // Saat kembali dari tab lain (buka link), refresh data tapi pertahankan filter kelas
+    document.addEventListener('visibilitychange', function() {
+      let modal = document.getElementById('inboxModal');
+      if (!document.hidden && modal && !modal.classList.contains('hidden')) {
+        let savedKelas = document.getElementById('inboxFilterKelas').value;
+        let savedMode  = document.getElementById('inboxFilterMode').value;
+        let savedCari  = document.getElementById('inboxSearch').value;
+        loadInboxSilent(savedKelas, savedMode, savedCari);
+      }
+    });
+
+    function loadInboxSilent(savedKelas, savedMode, savedCari) {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          inboxDataGlobal = data || [];
+          let kelasList = [...new Set(inboxDataGlobal.map(r => r.kelas).filter(Boolean))].sort();
+          let sel = document.getElementById('inboxFilterKelas');
+          sel.innerHTML = '<option value="">-- Semua Kelas --</option>';
+          kelasList.forEach(k => {
+            let o = document.createElement('option');
+            o.value = k; o.innerText = k;
+            if (k === savedKelas) o.selected = true;
+            sel.appendChild(o);
+          });
+          // Kembalikan filter lainnya
+          document.getElementById('inboxFilterMode').value = savedMode || '';
+          document.getElementById('inboxSearch').value     = savedCari || '';
+          filterInboxLokal();
+        })
+        .getInboxTugas();
     }
 
     // ── Helpers read-tracking via localStorage ──────────────
