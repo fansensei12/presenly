@@ -434,7 +434,7 @@
             <div class="flex gap-2">
               <div class="relative flex-1">
                 <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#b026ff60;">schedule</span>
-                <input type="number" id="jp" min="1" max="12" value="2" placeholder="JP" title="Jam Pelajaran" class="w-full rounded-xl pl-9 pr-3 py-2.5 text-xs font-medium focus:outline-none transition-all" style="background:#0d0018;border:1px solid #b026ff25;color:#e2e8f0;" onfocus="this.style.borderColor='#b026ff'" onblur="this.style.borderColor='#b026ff25'">
+                <input type="number" id="jp" min="1" max="12" value="3" placeholder="JP" title="Jam Pelajaran" class="w-full rounded-xl pl-9 pr-3 py-2.5 text-xs font-medium focus:outline-none transition-all" style="background:#0d0018;border:1px solid #b026ff25;color:#e2e8f0;" onfocus="this.style.borderColor='#b026ff'" onblur="this.style.borderColor='#b026ff25'">
               </div>
               <div class="relative flex-1">
                 <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#ffe60050;">tag</span>
@@ -446,6 +446,26 @@
               </div>
             </div>
             <p class="text-[9px] font-medium italic" style="color:#555;">JN mengisi semua siswa sekaligus</p>
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold" style="color:#00ffb390;">Nilai Default (Semua Siswa)</label>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-base" style="color:#00ffb360;">grade</span>
+                <input type="number" id="nilaiDefaultGlobal" min="0" max="100" placeholder="0–100" title="Nilai default untuk semua siswa"
+                  class="w-full rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold focus:outline-none transition-all"
+                  style="background:#0d0018;border:1px solid #00ffb325;color:#00ffb3;"
+                  onfocus="this.style.borderColor='#00ffb3'" onblur="this.style.borderColor='#00ffb325'">
+              </div>
+              <button onclick="terapkanNilaiGlobal()" title="Terapkan ke semua siswa"
+                class="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black cursor-pointer transition-all"
+                style="background:linear-gradient(135deg,#00ffb3,#00d4ff);color:#050012;box-shadow:0 0 14px #00ffb340;"
+                onmouseover="this.style.filter='brightness(1.15)'" onmouseout="this.style.filter='none'">
+                <span class="material-icons-sharp text-sm">done_all</span>
+                <span>Terapkan</span>
+              </button>
+            </div>
+            <p class="text-[9px] font-medium italic" style="color:#555;">Isi nilai lalu klik Terapkan untuk mengisi semua siswa sekaligus</p>
           </div>
           <div class="space-y-1.5">
             <label class="block text-xs font-bold" style="color:#00d4ff90;">Catatan Kejadian</label>
@@ -1538,6 +1558,27 @@
       // Simpan JN terakhir agar bertahan saat ganti kelas
       try { localStorage.setItem('presenly_jn_global', jn); } catch(e) {}
       showToast('Sumatif ' + jn + ' diterapkan ke semua siswa.', 'success');
+    }
+
+    function terapkanNilaiGlobal() {
+      let inputEl = document.getElementById('nilaiDefaultGlobal');
+      let val = parseInt(inputEl.value);
+      if (isNaN(val) || val < 0 || val > 100) {
+        showToast('Masukkan nilai antara 0–100 terlebih dahulu.', 'error');
+        inputEl.focus();
+        return;
+      }
+      let count = 0;
+      listNamaSiswaGlobal.forEach(function(_, index) {
+        localNilaiState[index] = val;
+        let el = document.getElementById('input_nilai_' + index);
+        if (el) { el.value = val; count++; }
+      });
+      if (count === 0) {
+        showToast('Belum ada siswa tampil di tab Penilaian.', 'warning');
+        return;
+      }
+      showToast('Nilai ' + val + ' diterapkan ke ' + count + ' siswa.', 'success');
     }
 
     function initJNGlobal() {
