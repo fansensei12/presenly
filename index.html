@@ -1174,6 +1174,55 @@
     </div>
   </div>
 
+  <!-- ===== MODAL PILIH FORMAT COPY ===== -->
+  <div id="copyFormatModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center hidden">
+    <div class="cyber-modal modal-box max-w-xs w-full p-6 m-4 relative text-center flex flex-col items-center gap-4">
+      <div class="w-14 h-14 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,#00ffb3,#00d4ff);box-shadow:0 0 20px #00ffb340;">
+        <span class="material-icons-sharp text-white text-2xl">content_copy</span>
+      </div>
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style="color:#00ffb3;">Pilih Format Copy</p>
+        <h3 class="text-sm font-extrabold text-slate-100" id="copyFormatKolomLabel">Kolom T1</h3>
+      </div>
+      <div class="w-full flex flex-col gap-2.5">
+        <button onclick="eksekusiCopyFormat('lengkap')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left cursor-pointer transition-all" style="background:#0d0018;border:1px solid #00ffb330;" onmouseover="this.style.borderColor='#00ffb3'" onmouseout="this.style.borderColor='#00ffb330'">
+          <span class="material-icons-sharp text-base" style="color:#00ffb3;">badge</span>
+          <span>
+            <span class="block text-xs font-bold text-slate-100">Nama + Nilai</span>
+            <span class="block text-[10px] text-slate-500">Salin nama siswa beserta nilainya</span>
+          </span>
+        </button>
+        <button onclick="eksekusiCopyFormat('nilai')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left cursor-pointer transition-all" style="background:#0d0018;border:1px solid #00d4ff30;" onmouseover="this.style.borderColor='#00d4ff'" onmouseout="this.style.borderColor='#00d4ff30'">
+          <span class="material-icons-sharp text-base" style="color:#00d4ff;">numbers</span>
+          <span>
+            <span class="block text-xs font-bold text-slate-100">Nilai Saja</span>
+            <span class="block text-[10px] text-slate-500">Hanya angka, tanpa nama siswa</span>
+          </span>
+        </button>
+      </div>
+      <button onclick="tutupCopyFormatModal()" class="text-[11px] font-bold text-slate-500 hover:text-slate-300 cursor-pointer mt-1">Batal</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL SUKSES COPY ===== -->
+  <div id="copySuccessModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center hidden">
+    <div class="cyber-modal modal-box max-w-xs w-full p-7 m-4 relative text-center flex flex-col items-center gap-4">
+      <div class="relative flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-600 to-teal-500 flex items-center justify-center shadow-xl shadow-emerald-500/30">
+          <span class="material-icons-sharp text-white text-3xl">check</span>
+        </div>
+        <div class="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping"></div>
+      </div>
+      <div>
+        <p class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1">Berhasil Disalin</p>
+        <p class="text-xs text-slate-300 leading-relaxed" id="copySuccessMessage">Data berhasil disalin ke clipboard.</p>
+      </div>
+      <button onclick="tutupCopySuccessModal()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-black text-sm py-3 rounded-2xl shadow-lg cursor-pointer active:scale-[0.98] transition-all hover:shadow-emerald-500/30 hover:shadow-xl">
+        OK
+      </button>
+    </div>
+  </div>
+
   <!-- ===== SUCCESS POPUP ===== -->
   <div id="successPopup" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] flex items-center justify-center hidden">
     <canvas id="konfettiCanvas" class="fixed inset-0 pointer-events-none z-[59]" style="width:100%;height:100%"></canvas>
@@ -2223,17 +2272,60 @@
       filterNilaiLokal();
     }
 
+    // State sementara untuk modal pilihan format copy
+    let pendingCopyData = null; // { label, values, namaSiswaArr }
+
     function copyKolomTunggal(label, values, namaSiswaArr) {
       if (!values.length) {
-        showToast('Tidak ada data pada kolom ' + label + '.', 'warning');
+        tampilkanCopySuccess('Tidak ada data pada kolom ' + label + '.');
         return;
       }
-      let baris = ['Nama Siswa\t' + label];
-      namaSiswaArr.forEach((nama, i) => {
-        baris.push(nama + '\t' + (values[i] === '' ? '' : values[i]));
-      });
+      pendingCopyData = { label, values, namaSiswaArr };
+      document.getElementById('copyFormatKolomLabel').innerText = 'Kolom ' + label;
+      document.getElementById('copyFormatModal').classList.remove('hidden');
+    }
+
+    function tutupCopyFormatModal() {
+      document.getElementById('copyFormatModal').classList.add('hidden');
+      pendingCopyData = null;
+    }
+
+    function eksekusiCopyFormat(format) {
+      if (!pendingCopyData) return;
+
+      if (pendingCopyData.mode === 'semua') {
+        eksekusiCopySemua(format);
+        return;
+      }
+
+      let { label, values, namaSiswaArr } = pendingCopyData;
+      let baris;
+
+      if (format === 'lengkap') {
+        baris = ['Nama Siswa\t' + label];
+        namaSiswaArr.forEach((nama, i) => {
+          baris.push(nama + '\t' + (values[i] === '' ? '' : values[i]));
+        });
+      } else {
+        baris = [label];
+        values.forEach(v => baris.push(v === '' ? '' : String(v)));
+      }
+
       let teks = baris.join('\n');
-      salinKeClipboard(teks, 'Kolom ' + label + ' (' + namaSiswaArr.length + ' siswa) disalin!');
+      let pesan = (format === 'lengkap' ? 'Nama + nilai' : 'Nilai') + ' kolom ' + label + ' (' + namaSiswaArr.length + ' siswa) berhasil disalin.';
+
+      document.getElementById('copyFormatModal').classList.add('hidden');
+      salinKeClipboard(teks, pesan);
+      pendingCopyData = null;
+    }
+
+    function tampilkanCopySuccess(pesan) {
+      document.getElementById('copySuccessMessage').innerText = pesan;
+      document.getElementById('copySuccessModal').classList.remove('hidden');
+    }
+
+    function tutupCopySuccessModal() {
+      document.getElementById('copySuccessModal').classList.add('hidden');
     }
 
     function salinKeClipboard(teks, pesanSukses) {
@@ -2249,11 +2341,11 @@
       }
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(teks)
-          .then(() => showToast(pesanSukses, 'success'))
-          .catch(() => { fallbackCopy(teks); showToast(pesanSukses, 'success'); });
+          .then(() => tampilkanCopySuccess(pesanSukses))
+          .catch(() => { fallbackCopy(teks); tampilkanCopySuccess(pesanSukses); });
       } else {
         fallbackCopy(teks);
-        showToast(pesanSukses, 'success');
+        tampilkanCopySuccess(pesanSukses);
       }
     }
 
@@ -2442,13 +2534,22 @@
     function copySemuaNilai() {
       let data = window.nilaiDataTampil || [];
       if (!data.length) {
-        showToast('Tidak ada data nilai untuk disalin.', 'warning');
+        tampilkanCopySuccess('Tidak ada data nilai untuk disalin.');
         return;
       }
+      pendingCopyData = { mode: 'semua' };
+      document.getElementById('copyFormatKolomLabel').innerText = 'Semua Kolom (' + (nilaiModeAktif === 'sumatif' ? 'Sumatif' : 'Tugas Harian') + ')';
+      document.getElementById('copyFormatModal').classList.remove('hidden');
+    }
 
+    function eksekusiCopySemua(format) {
+      let data = window.nilaiDataTampil || [];
       let header, baris;
+      let pakaiNama = format === 'lengkap';
+
       if (nilaiModeAktif === 'sumatif') {
-        header = ['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'];
+        header = pakaiNama ? ['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata']
+                            : ['Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'];
         baris = [header.join('\t')];
         data.forEach(r => {
           let s1 = (r.s1 !== null && r.s1 !== undefined) ? r.s1 : '';
@@ -2456,15 +2557,16 @@
           let s3 = (r.s3 !== null && r.s3 !== undefined) ? r.s3 : '';
           let valsNum = [s1,s2,s3].filter(v => v !== '').map(parseFloat);
           let rata = valsNum.length ? (valsNum.reduce((a,b)=>a+b,0)/valsNum.length).toFixed(1) : '';
-          baris.push([r.nama||'-', r.kelas||'-', s1, s2, s3, rata].join('\t'));
+          let row = pakaiNama ? [r.nama||'-', r.kelas||'-', s1, s2, s3, rata] : [s1, s2, s3, rata];
+          baris.push(row.join('\t'));
         });
       } else {
-        header = ['Nama Siswa', 'Kelas'];
+        header = pakaiNama ? ['Nama Siswa', 'Kelas'] : [];
         for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) header.push('T' + k);
         header.push('Rata-rata');
         baris = [header.join('\t')];
         data.forEach(r => {
-          let row = [r.nama || '-', r.kelas || '-'];
+          let row = pakaiNama ? [r.nama || '-', r.kelas || '-'] : [];
           let vals = [];
           for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) {
             let v = r['t' + k];
@@ -2478,7 +2580,10 @@
         });
       }
 
-      salinKeClipboard(baris.join('\n'), 'Semua nilai (' + data.length + ' siswa) disalin ke clipboard!');
+      document.getElementById('copyFormatModal').classList.add('hidden');
+      let pesan = (pakaiNama ? 'Nama + nilai' : 'Nilai') + ' semua kolom (' + data.length + ' siswa) berhasil disalin.';
+      salinKeClipboard(baris.join('\n'), pesan);
+      pendingCopyData = null;
     }
 
     // ================= KALKULATOR =================
