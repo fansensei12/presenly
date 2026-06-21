@@ -2307,7 +2307,7 @@
           baris.push(nama + '\t' + (values[i] === '' ? '' : values[i]));
         });
       } else {
-        baris = [label];
+        baris = [];
         values.forEach(v => baris.push(v === '' ? '' : String(v)));
       }
 
@@ -2544,13 +2544,12 @@
 
     function eksekusiCopySemua(format) {
       let data = window.nilaiDataTampil || [];
-      let header, baris;
+      let baris;
       let pakaiNama = format === 'lengkap';
 
       if (nilaiModeAktif === 'sumatif') {
-        header = pakaiNama ? ['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata']
-                            : ['Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'];
-        baris = [header.join('\t')];
+        baris = [];
+        if (pakaiNama) baris.push(['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'].join('\t'));
         data.forEach(r => {
           let s1 = (r.s1 !== null && r.s1 !== undefined) ? r.s1 : '';
           let s2 = (r.s2 !== null && r.s2 !== undefined) ? r.s2 : '';
@@ -2561,10 +2560,13 @@
           baris.push(row.join('\t'));
         });
       } else {
-        header = pakaiNama ? ['Nama Siswa', 'Kelas'] : [];
-        for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) header.push('T' + k);
-        header.push('Rata-rata');
-        baris = [header.join('\t')];
+        baris = [];
+        if (pakaiNama) {
+          let header = ['Nama Siswa', 'Kelas'];
+          for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) header.push('T' + k);
+          header.push('Rata-rata');
+          baris.push(header.join('\t'));
+        }
         data.forEach(r => {
           let row = pakaiNama ? [r.nama || '-', r.kelas || '-'] : [];
           let vals = [];
