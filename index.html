@@ -2310,18 +2310,6 @@
     // Helper ambil nilai kolom tertentu dari baris yang sedang tampil (t1-t30 atau s1-s3)
     function currentNilaiValues(key) {
       let rows = (window.nilaiDataTampil || []);
-      if (key.startsWith('s')) {
-        let idx = parseInt(key.substring(1)); // 1,2,3
-        let start = (idx - 1) * 10 + 1, end = idx * 10;
-        return rows.map(r => {
-          let vals = [];
-          for (let k = start; k <= end; k++) {
-            let v = r['t' + k];
-            if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
-          }
-          return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
-        });
-      }
       return rows.map(r => {
         let v = r[key];
         return (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) ? parseFloat(v) : '';
@@ -2419,20 +2407,10 @@
       let allValsGlobal = [];
       let terisiCount = 0;
 
-      function hitungS(r, idx) {
-        let start = (idx - 1) * 10 + 1, end = idx * 10;
-        let vals = [];
-        for (let k = start; k <= end; k++) {
-          let v = r['t' + k];
-          if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
-        }
-        return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : null;
-      }
-
       data.forEach(function(r, i) {
         let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
-        let s1 = hitungS(r,1), s2 = hitungS(r,2), s3 = hitungS(r,3);
-        let vals = [s1,s2,s3].filter(v => v !== null);
+        let s1 = r.s1, s2 = r.s2, s3 = r.s3;
+        let vals = [s1,s2,s3].filter(v => v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v))).map(parseFloat);
         vals.forEach(v => { allValsGlobal.push(v); terisiCount++; });
 
         let rataStr = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '—';
@@ -2472,17 +2450,10 @@
       if (nilaiModeAktif === 'sumatif') {
         header = ['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'];
         baris = [header.join('\t')];
-        function hitungS(r, idx) {
-          let start = (idx - 1) * 10 + 1, end = idx * 10;
-          let vals = [];
-          for (let k = start; k <= end; k++) {
-            let v = r['t' + k];
-            if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
-          }
-          return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
-        }
         data.forEach(r => {
-          let s1 = hitungS(r,1), s2 = hitungS(r,2), s3 = hitungS(r,3);
+          let s1 = (r.s1 !== null && r.s1 !== undefined) ? r.s1 : '';
+          let s2 = (r.s2 !== null && r.s2 !== undefined) ? r.s2 : '';
+          let s3 = (r.s3 !== null && r.s3 !== undefined) ? r.s3 : '';
           let valsNum = [s1,s2,s3].filter(v => v !== '').map(parseFloat);
           let rata = valsNum.length ? (valsNum.reduce((a,b)=>a+b,0)/valsNum.length).toFixed(1) : '';
           baris.push([r.nama||'-', r.kelas||'-', s1, s2, s3, rata].join('\t'));
