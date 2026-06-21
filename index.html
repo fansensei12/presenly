@@ -1085,10 +1085,25 @@
       <div class="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <span class="material-icons-sharp text-indigo-400 text-lg">bar_chart</span>
-          <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Rekap Nilai Sumatif</h3>
+          <h3 class="text-sm font-extrabold text-slate-100 uppercase tracking-wider">Rekap Nilai (Tugas 1–30)</h3>
         </div>
-        <button onclick="toggleNilaiModal()" class="p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
-          <span class="material-icons-sharp block text-base">close</span>
+        <div class="flex items-center gap-2">
+          <button onclick="copySemuaNilai()" id="btnCopyNilai" title="Copy semua nilai (format tabel)" class="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-400 text-emerald-300 text-xs font-bold rounded-xl cursor-pointer transition-all">
+            <span class="material-icons-sharp text-sm">content_copy</span> Copy Semua
+          </button>
+          <button onclick="toggleNilaiModal()" class="p-1 rounded-xl cursor-pointer" style="color:#ff224450;" onmouseover="this.style.color='#ff2244'" onmouseout="this.style.color='#ff224450'">
+            <span class="material-icons-sharp block text-base">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex items-center gap-2 px-5 pt-2 pb-1 shrink-0">
+        <button onclick="switchNilaiTab('tugas')" id="nilaiTabBtnTugas" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md">
+          <span class="material-icons-sharp text-sm">checklist</span> Tugas Harian (T1–T30)
+        </button>
+        <button onclick="switchNilaiTab('sumatif')" id="nilaiTabBtnSumatif" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-slate-500 hover:text-slate-300">
+          <span class="material-icons-sharp text-sm">summarize</span> Sumatif (S1–S3)
         </button>
       </div>
 
@@ -1111,6 +1126,7 @@
           <span class="material-icons-sharp text-sm">people</span>
           <span id="nilaiJumlah">0</span> siswa
         </div>
+        <p class="text-[9px] font-medium italic w-full" style="color:#555;">Klik ikon copy di header kolom untuk menyalin satu kolom saja</p>
       </div>
 
       <!-- Loading -->
@@ -1128,15 +1144,11 @@
 
       <!-- Tabel -->
       <div class="flex-1 overflow-auto p-4">
-        <table class="w-full text-xs border-collapse min-w-[500px]">
+        <table class="w-full text-xs border-collapse" id="tabelNilaiFull">
           <thead class="sticky top-0 z-10">
-            <tr class="bg-slate-900 text-[10px] font-black uppercase tracking-widest">
-              <th class="px-3 py-3 text-left border-b border-indigo-500/20 text-indigo-400/80">Nama Siswa</th>
-              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-blue-400/80 w-[70px]">Kelas</th>
-              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-emerald-400 w-[80px]">Sumatif 1</th>
-              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-yellow-400 w-[80px]">Sumatif 2</th>
-              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-orange-400 w-[80px]">Sumatif 3</th>
-              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-purple-400 w-[90px]">Rata-rata</th>
+            <tr class="bg-slate-900 text-[10px] font-black uppercase tracking-widest" id="nilaiTheadRow">
+              <th class="px-3 py-3 text-left border-b border-indigo-500/20 text-indigo-400/80 sticky left-0 bg-slate-900 z-20 min-w-[140px]">Nama Siswa</th>
+              <th class="px-3 py-3 text-center border-b border-indigo-500/20 text-blue-400/80 w-[60px] sticky left-[140px] bg-slate-900 z-20">Kelas</th>
             </tr>
           </thead>
           <tbody id="nilaiTbody" class="divide-y divide-indigo-500/10"></tbody>
@@ -1144,22 +1156,18 @@
       </div>
 
       <!-- Footer stats -->
-      <div id="nilaiStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 py-4 border-t border-indigo-500/10 bg-black/30">
+      <div id="nilaiStats" class="hidden shrink-0 grid grid-cols-2 sm:grid-cols-3 gap-3 px-5 py-4 border-t border-indigo-500/10 bg-black/30">
+        <div class="bg-black/40 rounded-xl p-3 border border-purple-500/10 text-center">
+          <p class="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest mb-1">Rata-rata Semua</p>
+          <p id="nilaiStatAll" class="text-xl font-extrabold text-purple-300">-</p>
+        </div>
         <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/10 text-center">
-          <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Rata S1</p>
-          <p id="nilaiStatS1" class="text-xl font-extrabold text-emerald-300">-</p>
+          <p id="nilaiStatTerisiLabel" class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest mb-1">Tugas Terisi</p>
+          <p id="nilaiStatTerisi" class="text-xl font-extrabold text-emerald-300">-</p>
         </div>
         <div class="bg-black/40 rounded-xl p-3 border border-yellow-500/10 text-center">
-          <p class="text-[10px] font-bold text-yellow-400/60 uppercase tracking-widest mb-1">Rata S2</p>
-          <p id="nilaiStatS2" class="text-xl font-extrabold text-yellow-300">-</p>
-        </div>
-        <div class="bg-black/40 rounded-xl p-3 border border-orange-500/10 text-center">
-          <p class="text-[10px] font-bold text-orange-400/60 uppercase tracking-widest mb-1">Rata S3</p>
-          <p id="nilaiStatS3" class="text-xl font-extrabold text-orange-300">-</p>
-        </div>
-        <div class="bg-black/40 rounded-xl p-3 border border-purple-500/10 text-center">
-          <p class="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest mb-1">Rata Semua</p>
-          <p id="nilaiStatAll" class="text-xl font-extrabold text-purple-300">-</p>
+          <p class="text-[10px] font-bold text-yellow-400/60 uppercase tracking-widest mb-1">Jumlah Siswa</p>
+          <p id="nilaiStatJumlah" class="text-xl font-extrabold text-yellow-300">-</p>
         </div>
       </div>
 
@@ -2201,68 +2209,305 @@
       renderNilaiSumatif(hasil);
     }
 
+    const TOTAL_KOLOM_TUGAS = 30;
+    let nilaiModeAktif = 'tugas'; // 'tugas' atau 'sumatif'
+
+    function switchNilaiTab(mode) {
+      nilaiModeAktif = mode;
+      let btnTugas   = document.getElementById('nilaiTabBtnTugas');
+      let btnSumatif = document.getElementById('nilaiTabBtnSumatif');
+      let aktifCls   = 'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md';
+      let nonAktifCls= 'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer text-slate-500 hover:text-slate-300';
+      btnTugas.className   = mode === 'tugas'   ? aktifCls : nonAktifCls;
+      btnSumatif.className = mode === 'sumatif' ? aktifCls : nonAktifCls;
+      filterNilaiLokal();
+    }
+
+    function copyKolomTunggal(label, values, namaSiswaArr) {
+      if (!values.length) {
+        showToast('Tidak ada data pada kolom ' + label + '.', 'warning');
+        return;
+      }
+      let baris = ['Nama Siswa\t' + label];
+      namaSiswaArr.forEach((nama, i) => {
+        baris.push(nama + '\t' + (values[i] === '' ? '' : values[i]));
+      });
+      let teks = baris.join('\n');
+      salinKeClipboard(teks, 'Kolom ' + label + ' (' + namaSiswaArr.length + ' siswa) disalin!');
+    }
+
+    function salinKeClipboard(teks, pesanSukses) {
+      function fallbackCopy(text) {
+        let ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(teks)
+          .then(() => showToast(pesanSukses, 'success'))
+          .catch(() => { fallbackCopy(teks); showToast(pesanSukses, 'success'); });
+      } else {
+        fallbackCopy(teks);
+        showToast(pesanSukses, 'success');
+      }
+    }
+
+    function buildHeaderTugas() {
+      let theadRow = document.getElementById('nilaiTheadRow');
+      while (theadRow.children.length > 2) theadRow.removeChild(theadRow.lastChild);
+
+      for (let i = 1; i <= TOTAL_KOLOM_TUGAS; i++) {
+        let label = 'T' + i;
+        let th = document.createElement('th');
+        th.className = 'px-1 py-2 text-center border-b border-indigo-500/20 text-cyan-400/80 w-[56px]';
+        th.innerHTML = `
+          <div class="flex flex-col items-center gap-0.5">
+            <span>${label}</span>
+            <span onclick="copyKolomTunggal('${label}', currentNilaiValues('t${i}'), currentNilaiNama())" title="Copy kolom ${label}" class="material-icons-sharp text-[12px] cursor-pointer text-cyan-400/40 hover:text-cyan-300">content_copy</span>
+          </div>`;
+        theadRow.appendChild(th);
+      }
+      let thRata = document.createElement('th');
+      thRata.className = 'px-2 py-2 text-center border-b border-indigo-500/20 text-purple-400 w-[90px]';
+      thRata.innerHTML = `
+        <div class="flex flex-col items-center gap-0.5">
+          <span>Rata-rata</span>
+          <span onclick="copyKolomTunggal('Rata-rata', currentRataValues(), currentNilaiNama())" title="Copy kolom Rata-rata" class="material-icons-sharp text-[12px] cursor-pointer text-purple-400/40 hover:text-purple-300">content_copy</span>
+        </div>`;
+      theadRow.appendChild(thRata);
+    }
+
+    function buildHeaderSumatif() {
+      let theadRow = document.getElementById('nilaiTheadRow');
+      while (theadRow.children.length > 2) theadRow.removeChild(theadRow.lastChild);
+
+      ['Sumatif 1','Sumatif 2','Sumatif 3'].forEach((label, idx) => {
+        let key = 's' + (idx + 1);
+        let th = document.createElement('th');
+        th.className = 'px-2 py-2 text-center border-b border-indigo-500/20 text-cyan-400/80 w-[110px]';
+        th.innerHTML = `
+          <div class="flex flex-col items-center gap-0.5">
+            <span>${label}</span>
+            <span onclick="copyKolomTunggal('${label}', currentNilaiValues('${key}'), currentNilaiNama())" title="Copy kolom ${label}" class="material-icons-sharp text-[12px] cursor-pointer text-cyan-400/40 hover:text-cyan-300">content_copy</span>
+          </div>`;
+        theadRow.appendChild(th);
+      });
+      let thRata = document.createElement('th');
+      thRata.className = 'px-2 py-2 text-center border-b border-indigo-500/20 text-purple-400 w-[90px]';
+      thRata.innerHTML = `
+        <div class="flex flex-col items-center gap-0.5">
+          <span>Rata-rata</span>
+          <span onclick="copyKolomTunggal('Rata-rata', currentRataValues(), currentNilaiNama())" title="Copy kolom Rata-rata" class="material-icons-sharp text-[12px] cursor-pointer text-purple-400/40 hover:text-purple-300">content_copy</span>
+        </div>`;
+      theadRow.appendChild(thRata);
+    }
+
+    // Helper ambil nilai kolom tertentu dari baris yang sedang tampil (t1-t30 atau s1-s3)
+    function currentNilaiValues(key) {
+      let rows = (window.nilaiDataTampil || []);
+      if (key.startsWith('s')) {
+        let idx = parseInt(key.substring(1)); // 1,2,3
+        let start = (idx - 1) * 10 + 1, end = idx * 10;
+        return rows.map(r => {
+          let vals = [];
+          for (let k = start; k <= end; k++) {
+            let v = r['t' + k];
+            if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
+          }
+          return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
+        });
+      }
+      return rows.map(r => {
+        let v = r[key];
+        return (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) ? parseFloat(v) : '';
+      });
+    }
+
+    function currentRataValues() {
+      let rows = (window.nilaiDataTampil || []);
+      return rows.map(r => {
+        let vals = [];
+        for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) {
+          let v = r['t' + k];
+          if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
+        }
+        return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
+      });
+    }
+
+    function currentNilaiNama() {
+      return (window.nilaiDataTampil || []).map(r => r.nama || '-');
+    }
+
+    function nilaiCellHtml(val, warnaBaik, warnaKurang) {
+      if (val === null || val === '' || val === undefined || isNaN(parseFloat(val))) return '<span class="text-slate-600">—</span>';
+      let n = parseFloat(val);
+      let warna = n >= 75 ? warnaBaik : n >= 60 ? 'text-yellow-300' : warnaKurang;
+      return `<span class="font-extrabold ${warna}">${n % 1 === 0 ? n.toFixed(0) : n.toFixed(1)}</span>`;
+    }
+
     function renderNilaiSumatif(data) {
       let tbody = document.getElementById('nilaiTbody');
       let empty = document.getElementById('nilaiEmpty');
       let stats = document.getElementById('nilaiStats');
       tbody.innerHTML = '';
       document.getElementById('nilaiJumlah').innerText = data.length;
+      window.nilaiDataTampil = data;
 
-      if (data.length === 0) { empty.classList.remove('hidden'); stats.classList.add('hidden'); return; }
+      if (data.length === 0) {
+        empty.classList.remove('hidden'); stats.classList.add('hidden');
+        document.getElementById('nilaiTheadRow').querySelectorAll('th:nth-child(n+3)').forEach(el => el.remove());
+        return;
+      }
       empty.classList.add('hidden'); stats.classList.remove('hidden');
 
-      // Hitung rata-rata kelas
-      let s1arr = data.filter(r => r.s1 !== null && r.s1 !== '' && !isNaN(parseFloat(r.s1))).map(r => parseFloat(r.s1));
-      let s2arr = data.filter(r => r.s2 !== null && r.s2 !== '' && !isNaN(parseFloat(r.s2))).map(r => parseFloat(r.s2));
-      let s3arr = data.filter(r => r.s3 !== null && r.s3 !== '' && !isNaN(parseFloat(r.s3))).map(r => parseFloat(r.s3));
-      let allArr = [...s1arr, ...s2arr, ...s3arr];
-      let avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : '-';
-      document.getElementById('nilaiStatS1').innerText  = avg(s1arr);
-      document.getElementById('nilaiStatS2').innerText  = avg(s2arr);
-      document.getElementById('nilaiStatS3').innerText  = avg(s3arr);
-      document.getElementById('nilaiStatAll').innerText = avg(allArr);
+      if (nilaiModeAktif === 'sumatif') {
+        buildHeaderSumatif();
+        renderBarisSumatif(data);
+      } else {
+        buildHeaderTugas();
+        renderBarisTugas(data);
+      }
+    }
+
+    function renderBarisTugas(data) {
+      let tbody = document.getElementById('nilaiTbody');
+      let allValsGlobal = [];
+      let terisiCount = 0;
 
       data.forEach(function(r, i) {
         let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
-
-        function nilaiCell(val, warnaBaik, warnaKurang) {
-          if (val === null || val === '' || val === undefined || isNaN(parseFloat(val))) return '<span class="text-slate-600">—</span>';
-          let n = parseFloat(val);
-          let warna = n >= 75 ? warnaBaik : n >= 60 ? 'text-yellow-300' : warnaKurang;
-          return `<span class="font-extrabold ${warna}">${n.toFixed(1)}</span>`;
+        let vals = [];
+        let tugasCellsHtml = '';
+        for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) {
+          let v = r['t' + k];
+          let valid = v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v));
+          if (valid) { vals.push(parseFloat(v)); allValsGlobal.push(parseFloat(v)); terisiCount++; }
+          tugasCellsHtml += `<td class="px-1 py-3 text-center">${nilaiCellHtml(v,'text-emerald-300','text-red-300')}</td>`;
         }
-
-        // Hitung rata-rata per siswa — hanya nilai yang benar-benar ada
-        let vals = [r.s1, r.s2, r.s3].filter(v => v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))).map(v => parseFloat(v));
         let rataStr = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '—';
         let rataNum = vals.length ? parseFloat(rataStr) : null;
         let rataWarna = rataNum === null ? 'text-slate-500' : rataNum >= 75 ? 'text-purple-300' : rataNum >= 60 ? 'text-yellow-300' : 'text-red-300';
 
-        // Progress bar rata-rata
-        let pct = rataNum ? Math.min(rataNum, 100) : 0;
-        let barColor = pct >= 75 ? 'bg-purple-500' : pct >= 60 ? 'bg-yellow-500' : 'bg-red-500';
+        let tr = document.createElement('tr');
+        tr.className = rowBg + ' hover:bg-indigo-500/5 transition-colors';
+        tr.innerHTML = `
+          <td class="px-3 py-3 font-semibold text-slate-100 sticky left-0 z-10" style="background:inherit;">${r.nama||'-'}</td>
+          <td class="px-3 py-3 text-center sticky left-[140px] z-10" style="background:inherit;">
+            <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">${r.kelas||'-'}</span>
+          </td>
+          ${tugasCellsHtml}
+          <td class="px-3 py-3 text-center font-extrabold ${rataWarna}">${rataStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      let avgAll = allValsGlobal.length ? (allValsGlobal.reduce((a,b)=>a+b,0)/allValsGlobal.length).toFixed(1) : '-';
+      document.getElementById('nilaiStatAll').innerText    = avgAll;
+      document.getElementById('nilaiStatTerisi').innerText = terisiCount;
+      document.getElementById('nilaiStatJumlah').innerText = data.length;
+      document.getElementById('nilaiStatTerisiLabel').innerText = 'Tugas Terisi';
+    }
+
+    function renderBarisSumatif(data) {
+      let tbody = document.getElementById('nilaiTbody');
+      let allValsGlobal = [];
+      let terisiCount = 0;
+
+      function hitungS(r, idx) {
+        let start = (idx - 1) * 10 + 1, end = idx * 10;
+        let vals = [];
+        for (let k = start; k <= end; k++) {
+          let v = r['t' + k];
+          if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
+        }
+        return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+      }
+
+      data.forEach(function(r, i) {
+        let rowBg = i % 2 === 0 ? 'bg-black/20' : 'bg-black/40';
+        let s1 = hitungS(r,1), s2 = hitungS(r,2), s3 = hitungS(r,3);
+        let vals = [s1,s2,s3].filter(v => v !== null);
+        vals.forEach(v => { allValsGlobal.push(v); terisiCount++; });
+
+        let rataStr = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '—';
+        let rataNum = vals.length ? parseFloat(rataStr) : null;
+        let rataWarna = rataNum === null ? 'text-slate-500' : rataNum >= 75 ? 'text-purple-300' : rataNum >= 60 ? 'text-yellow-300' : 'text-red-300';
 
         let tr = document.createElement('tr');
         tr.className = rowBg + ' hover:bg-indigo-500/5 transition-colors';
         tr.innerHTML = `
-          <td class="px-3 py-3 font-semibold text-slate-100">${r.nama||'-'}</td>
-          <td class="px-3 py-3 text-center">
+          <td class="px-3 py-3 font-semibold text-slate-100 sticky left-0 z-10" style="background:inherit;">${r.nama||'-'}</td>
+          <td class="px-3 py-3 text-center sticky left-[140px] z-10" style="background:inherit;">
             <span class="px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/20">${r.kelas||'-'}</span>
           </td>
-          <td class="px-3 py-3 text-center">${nilaiCell(r.s1,'text-emerald-300','text-red-300')}</td>
-          <td class="px-3 py-3 text-center">${nilaiCell(r.s2,'text-yellow-300','text-red-300')}</td>
-          <td class="px-3 py-3 text-center">${nilaiCell(r.s3,'text-orange-300','text-red-300')}</td>
-          <td class="px-3 py-3">
-            <div class="flex items-center gap-1.5">
-              <div class="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                <div class="${barColor} h-1.5 rounded-full" style="width:${pct}%"></div>
-              </div>
-              <span class="font-extrabold text-[10px] ${rataWarna} w-8 text-right">${rataStr}</span>
-            </div>
-          </td>
+          <td class="px-2 py-3 text-center">${nilaiCellHtml(s1,'text-emerald-300','text-red-300')}</td>
+          <td class="px-2 py-3 text-center">${nilaiCellHtml(s2,'text-yellow-300','text-red-300')}</td>
+          <td class="px-2 py-3 text-center">${nilaiCellHtml(s3,'text-orange-300','text-red-300')}</td>
+          <td class="px-3 py-3 text-center font-extrabold ${rataWarna}">${rataStr}</td>
         `;
         tbody.appendChild(tr);
       });
+
+      let avgAll = allValsGlobal.length ? (allValsGlobal.reduce((a,b)=>a+b,0)/allValsGlobal.length).toFixed(1) : '-';
+      document.getElementById('nilaiStatAll').innerText    = avgAll;
+      document.getElementById('nilaiStatTerisi').innerText = terisiCount;
+      document.getElementById('nilaiStatJumlah').innerText = data.length;
+      document.getElementById('nilaiStatTerisiLabel').innerText = 'Sumatif Terisi';
+    }
+
+    function copySemuaNilai() {
+      let data = window.nilaiDataTampil || [];
+      if (!data.length) {
+        showToast('Tidak ada data nilai untuk disalin.', 'warning');
+        return;
+      }
+
+      let header, baris;
+      if (nilaiModeAktif === 'sumatif') {
+        header = ['Nama Siswa', 'Kelas', 'Sumatif 1', 'Sumatif 2', 'Sumatif 3', 'Rata-rata'];
+        baris = [header.join('\t')];
+        function hitungS(r, idx) {
+          let start = (idx - 1) * 10 + 1, end = idx * 10;
+          let vals = [];
+          for (let k = start; k <= end; k++) {
+            let v = r['t' + k];
+            if (v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v))) vals.push(parseFloat(v));
+          }
+          return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
+        }
+        data.forEach(r => {
+          let s1 = hitungS(r,1), s2 = hitungS(r,2), s3 = hitungS(r,3);
+          let valsNum = [s1,s2,s3].filter(v => v !== '').map(parseFloat);
+          let rata = valsNum.length ? (valsNum.reduce((a,b)=>a+b,0)/valsNum.length).toFixed(1) : '';
+          baris.push([r.nama||'-', r.kelas||'-', s1, s2, s3, rata].join('\t'));
+        });
+      } else {
+        header = ['Nama Siswa', 'Kelas'];
+        for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) header.push('T' + k);
+        header.push('Rata-rata');
+        baris = [header.join('\t')];
+        data.forEach(r => {
+          let row = [r.nama || '-', r.kelas || '-'];
+          let vals = [];
+          for (let k = 1; k <= TOTAL_KOLOM_TUGAS; k++) {
+            let v = r['t' + k];
+            let valid = v !== null && v !== '' && v !== undefined && !isNaN(parseFloat(v));
+            if (valid) vals.push(parseFloat(v));
+            row.push(valid ? parseFloat(v) : '');
+          }
+          let rata = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : '';
+          row.push(rata);
+          baris.push(row.join('\t'));
+        });
+      }
+
+      salinKeClipboard(baris.join('\n'), 'Semua nilai (' + data.length + ' siswa) disalin ke clipboard!');
     }
 
     // ================= KALKULATOR =================
