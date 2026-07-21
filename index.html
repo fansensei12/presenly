@@ -1256,6 +1256,42 @@
     </div>
   </div>
 
+  <!-- ===== KONFIRMASI GANTI KELAS ===== -->
+  <div id="gantiKelasModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[65] flex items-center justify-center hidden">
+    <div class="cyber-modal modal-box max-w-sm w-full p-7 m-4 relative text-center flex flex-col items-center gap-5">
+
+      <!-- Ikon peringatan animasi -->
+      <div class="relative flex items-center justify-center">
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-xl shadow-amber-500/30">
+          <span class="material-icons-sharp text-white text-4xl">sync_alt</span>
+        </div>
+        <div class="absolute inset-0 rounded-full bg-amber-500/20 animate-ping"></div>
+      </div>
+
+      <!-- Teks utama -->
+      <div>
+        <p class="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1">Konfirmasi</p>
+        <h2 class="text-lg font-extrabold text-white leading-tight">Ganti ke <span id="gantiKelasTarget" class="text-amber-400">Kelas Lain</span>?</h2>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          Materi &amp; catatan yang sedang diisi untuk <span class="font-bold text-white" id="gantiKelasAsal">kelas ini</span> belum disimpan dan akan hilang jika kamu berpindah kelas sekarang.
+        </p>
+      </div>
+
+      <!-- Ringkasan materi yg belum tersimpan -->
+      <div class="w-full bg-black/40 rounded-2xl border border-amber-500/15 p-4 text-left space-y-1.5" id="gantiKelasRingkasan"></div>
+
+      <!-- Tombol aksi -->
+      <div class="w-full flex flex-col gap-2.5">
+        <button onclick="konfirmasiGantiKelas(true)" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-sm py-3.5 rounded-2xl shadow-lg cursor-pointer active:scale-[0.98] transition-all hover:shadow-amber-500/30 hover:shadow-xl flex items-center justify-center gap-2">
+          <span class="material-icons-sharp text-lg">swap_horiz</span> Ya, Ganti Kelas
+        </button>
+        <button onclick="konfirmasiGantiKelas(false)" class="w-full bg-white/5 border border-white/10 text-slate-300 font-bold text-sm py-3 rounded-2xl cursor-pointer active:scale-[0.98] transition-all hover:bg-white/10">
+          Batal, Tetap di Sini
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ============================================================
     //  KONFIGURASI GITHUB PAGES
@@ -1502,25 +1538,81 @@
       showToast(`Beralih ke halaman ${currentTab}.`, "warning");
     }
 
+    let kelasTargetPending = null; // menyimpan kelas tujuan selama menunggu konfirmasi modal ganti kelas
+
     function loadSiswa() {
       let kelas = document.getElementById('dropdownKelas').value;
       let container = document.getElementById('tabelContainer');
       let placeholder = document.getElementById('placeholderSiswa');
-      let loading = document.getElementById('loadingSiswa');
-      
+
       if(!kelas) { container.classList.add('hidden'); placeholder.classList.remove('hidden'); return; }
 
-      // [FIX BUG 2] Konfirmasi dulu jika ada catatan/materi yang belum tersimpan,
-      // agar guru tidak kehilangan data saat tidak sengaja ganti kelas.
+      // [FIX BUG 2 + POPUP KEREN] Kalau ada materi/catatan yang belum disimpan,
+      // tampilkan modal konfirmasi kustom (bukan confirm() bawaan browser yang
+      // polos) sebelum benar-benar pindah kelas, agar guru tidak kehilangan
+      // data tanpa sengaja.
       let materiAda = document.getElementById('materi').value.trim();
       let catatanAda = document.getElementById('catatan').value.trim();
       if ((materiAda || catatanAda) && listNamaSiswaGlobal.length > 0) {
-        if (!confirm('Mengganti kelas akan menghapus materi dan catatan yang belum disimpan.\n\nLanjutkan ganti kelas?')) {
-          // Kembalikan dropdown ke kelas yang aktif sebelumnya
-          document.getElementById('dropdownKelas').value = kelasAktifSebelumnya;
-          return;
-        }
+        tampilGantiKelasModal(kelas, materiAda, catatanAda);
+        return;
       }
+
+      lanjutkanGantiKelas(kelas);
+    }
+
+    // Tampilkan modal konfirmasi ganti kelas dengan ringkasan data yang akan hilang
+    function tampilGantiKelasModal(kelasTujuan, materiAda, catatanAda) {
+      kelasTargetPending = kelasTujuan;
+      document.getElementById('gantiKelasTarget').innerText = kelasTujuan;
+      document.getElementById('gantiKelasAsal').innerText = kelasAktifSebelumnya || 'kelas ini';
+
+      let ringkasan = document.getElementById('gantiKelasRingkasan');
+      let itemsHtml = '';
+      if (materiAda) {
+        itemsHtml += `<div class="flex items-start gap-2">
+          <span class="material-icons-sharp text-amber-400 text-sm mt-0.5">menu_book</span>
+          <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Materi</p>
+          <p class="text-xs text-slate-300 font-semibold">${escapeHtml(materiAda)}</p></div>
+        </div>`;
+      }
+      if (catatanAda) {
+        itemsHtml += `<div class="flex items-start gap-2">
+          <span class="material-icons-sharp text-amber-400 text-sm mt-0.5">edit_note</span>
+          <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Catatan</p>
+          <p class="text-xs text-slate-300 font-semibold">${escapeHtml(catatanAda)}</p></div>
+        </div>`;
+      }
+      ringkasan.innerHTML = itemsHtml;
+
+      document.getElementById('gantiKelasModal').classList.remove('hidden');
+    }
+
+    // Dipanggil dari tombol di modal: lanjut === true (ganti kelas) / false (batal)
+    function konfirmasiGantiKelas(lanjut) {
+      document.getElementById('gantiKelasModal').classList.add('hidden');
+      let kelasTujuan = kelasTargetPending;
+      kelasTargetPending = null;
+
+      if (!lanjut) {
+        // Batal: kembalikan dropdown ke kelas yang masih aktif sebelumnya
+        document.getElementById('dropdownKelas').value = kelasAktifSebelumnya;
+        return;
+      }
+      lanjutkanGantiKelas(kelasTujuan);
+    }
+
+    // Kecilkan risiko XSS saat menampilkan materi/catatan guru di dalam modal
+    function escapeHtml(str) {
+      let div = document.createElement('div');
+      div.innerText = str;
+      return div.innerHTML;
+    }
+
+    function lanjutkanGantiKelas(kelas) {
+      let container = document.getElementById('tabelContainer');
+      let placeholder = document.getElementById('placeholderSiswa');
+      let loading = document.getElementById('loadingSiswa');
 
       // Catat kelas aktif sekarang sebelum proses ganti
       kelasAktifSebelumnya = kelas;
