@@ -395,6 +395,18 @@
 
         <div id="tabelContainer" class="hidden flex-col justify-between w-full">
           <div class="w-full">
+            <div class="p-4" style="border-bottom:1px solid #ff224420;background:#0d000f90;">
+              <div class="relative">
+                <span class="material-icons-sharp absolute left-3 top-2.5 text-lg pointer-events-none" style="color:#b026ff60;">search</span>
+                <input type="text" id="siswaSearch" oninput="filterSiswaTabel()" placeholder="Cari nama / NIS siswa..."
+                  class="w-full rounded-xl pl-10 pr-9 py-2.5 text-xs font-bold focus:outline-none transition-all"
+                  style="background:#0d0018;border:1px solid #b026ff40;color:#e2e8f0;"
+                  onfocus="this.style.borderColor='#ff2244'" onblur="this.style.borderColor='#b026ff40'">
+                <span id="siswaSearchClear" onclick="clearSiswaSearch()" title="Hapus pencarian"
+                  class="hidden material-icons-sharp absolute right-3 top-2.5 text-lg cursor-pointer" style="color:#ff224480;">close</span>
+              </div>
+            </div>
+
             <div class="hidden sm:grid grid-cols-12 p-4 text-[10px] font-bold uppercase tracking-widest" style="border-bottom:1px solid #ff224420;background:#0d000f90;">
               <div class="col-span-5 text-sm" style="color:#00d4ff80;">Informasi Siswa</div>
               <div id="thAksi" class="col-span-7 text-center text-sm" style="color:#00d4ff80;">Status Presensi</div>
@@ -402,6 +414,10 @@
             
             <div id="listSiswaMaster" class="p-2 sm:p-0 space-y-3 sm:space-y-0" style="divide-color:#ff224415;">
               </div>
+            <div id="siswaSearchEmpty" class="hidden p-10 text-center text-xs font-bold" style="color:#b026ff40;">
+              <span class="material-icons-sharp text-3xl block mb-2" style="color:#b026ff30;">person_search</span>
+              Siswa tidak ditemukan.
+            </div>
           </div>
           
           <div class="p-4 flex justify-end" style="background:#0d000f60;border-top:1px solid #ff224420;">
@@ -1625,6 +1641,8 @@
       // JN global tidak direset — tetap pakai nilai terakhir
       document.getElementById('catatan').value = '';
       document.getElementById('keterangan').value = '';
+      let siswaSearchEl = document.getElementById('siswaSearch');
+      if (siswaSearchEl) siswaSearchEl.value = '';
 
       google.script.run.withSuccessHandler(function(siswa) {
         listNamaSiswaGlobal = siswa;
@@ -1660,6 +1678,8 @@
 
         let rowElement = document.createElement('div');
         rowElement.className = "cyber-row sm:grid grid-cols-12 items-center p-3 sm:py-3 space-y-3 sm:space-y-0";
+        rowElement.dataset.nama = String(siswaObj.nama || '').toLowerCase();
+        rowElement.dataset.nis  = String(siswaObj.nis || '').toLowerCase();
         
         let aksiContainerHtml = currentTab === 'presensi' ? `
           <div class="absen-radio-wrap" style="background:#08000f;border:1px solid #ff224420;">
@@ -1702,6 +1722,37 @@
         `;
         masterList.appendChild(rowElement);
       });
+
+      // Pertahankan kata kunci pencarian yang sedang aktif (mis. setelah pindah tab Presensi/Penilaian)
+      filterSiswaTabel();
+    }
+
+    // Pencarian nama/NIS siswa di daftar (berlaku untuk tab Presensi & Penilaian,
+    // karena keduanya memakai #listSiswaMaster yang sama)
+    function filterSiswaTabel() {
+      let inputEl = document.getElementById('siswaSearch');
+      if (!inputEl) return;
+      let q = inputEl.value.trim().toLowerCase();
+      document.getElementById('siswaSearchClear').classList.toggle('hidden', q === '');
+
+      let rows = document.querySelectorAll('#listSiswaMaster > div[data-nama]');
+      let jumlahTampil = 0;
+      rows.forEach(function(row) {
+        let cocok = q === '' || row.dataset.nama.includes(q) || row.dataset.nis.includes(q);
+        row.classList.toggle('hidden', !cocok);
+        if (cocok) jumlahTampil++;
+      });
+
+      let emptyEl = document.getElementById('siswaSearchEmpty');
+      if (emptyEl) emptyEl.classList.toggle('hidden', !(rows.length > 0 && jumlahTampil === 0));
+    }
+
+    function clearSiswaSearch() {
+      let inputEl = document.getElementById('siswaSearch');
+      if (!inputEl) return;
+      inputEl.value = '';
+      filterSiswaTabel();
+      inputEl.focus();
     }
 
     // Fungsi pembaruan array realtime agar tidak Null Pointer saat element DOM dihancurkan tab switcher
