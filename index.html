@@ -1739,7 +1739,11 @@
       let jumlahTampil = 0;
       rows.forEach(function(row) {
         let cocok = q === '' || row.dataset.nama.includes(q) || row.dataset.nis.includes(q);
-        row.classList.toggle('hidden', !cocok);
+        // [FIX] Pakai inline style, bukan class "hidden" — karena baris siswa
+        // juga punya class "sm:grid" yang pada CSS hasil generate Tailwind
+        // diletakkan setelah ".hidden", sehingga di layar >= sm class "hidden"
+        // kalah dan baris tetap terlihat walau sudah ditandai tersembunyi.
+        row.style.display = cocok ? '' : 'none';
         if (cocok) jumlahTampil++;
       });
 
