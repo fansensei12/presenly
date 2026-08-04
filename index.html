@@ -598,6 +598,13 @@
         </div>
         <button onclick="prosesAcak()" class="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white text-[11px] font-extrabold px-3 py-2 rounded-lg cursor-pointer transition-all">Acak Formasi</button>
       </div>
+      <label class="mb-4 flex items-start gap-2.5 bg-black p-3 rounded-xl border border-purple-500/10 cursor-pointer select-none">
+        <input type="checkbox" id="kelompokExcludeTidakHadir" checked onchange="prosesAcak()" class="mt-0.5 w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+        <span>
+          <span class="block text-[11px] font-bold text-slate-200">Kecualikan siswa yang tidak hadir</span>
+          <span id="kelompokExcludeInfo" class="block text-[10px] font-semibold text-purple-400/50 mt-0.5">Siswa berstatus Sakit / Izin / Alpa / Bolos di tab Presensi hari ini tidak akan dimasukkan ke kelompok.</span>
+        </span>
+      </label>
       <div id="hasilKelompokContainer" class="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4 p-0.5 flex-grow"></div>
     </div>
   </div>
@@ -1417,6 +1424,13 @@
     let kelasAktifSebelumnya = ''; // [FIX BUG 2] Untuk rollback dropdown jika ganti kelas dibatalkan
     let jurnalPanelOpen = false;
 
+    // [FIX BUG PERFORMA] Cache seluruh siswa semua kelas, diisi sekali saat
+    // halaman dibuka (lihat window.onload). Kalau sudah siap, ganti kelas
+    // tidak perlu request baru ke server lagi — tinggal filter di sini,
+    // jadi tampilan daftar siswa muncul instan.
+    let semuaSiswaGlobal = [];
+    let semuaSiswaSiap = false;
+
     function toggleJurnalPanel() {
       let body = document.getElementById('jurnalPanelBody');
       let icon = document.getElementById('jurnalPanelIcon');
@@ -1496,6 +1510,19 @@
     }
 
     window.onload = function() {
+      // [FIX BUG PERFORMA] Ambil seluruh siswa semua kelas sekali di awal,
+      // paralel dengan getDaftarKelas, supaya nanti ganti-ganti kelas tidak
+      // perlu tunggu request baru ke server (yang kena overhead cold-start
+      // Apps Script tiap kali dipanggil).
+      google.script.run.withSuccessHandler(function(data) {
+        semuaSiswaGlobal = data || [];
+        semuaSiswaSiap = true;
+      }).withFailureHandler(function() {
+        // Gagal ambil cache awal bukan masalah besar — sistem otomatis
+        // fallback ambil per-kelas dari server seperti sebelumnya (lihat ambilSiswaKelas).
+        semuaSiswaSiap = false;
+      }).getSemuaSiswa();
+
       google.script.run.withSuccessHandler(function(arrKelas) {
         let select = document.getElementById('dropdownKelas');
         select.innerHTML = '<option value="">-- Tentukan Kelas --</option>';
@@ -1625,6 +1652,22 @@
       return div.innerHTML;
     }
 
+    // [FIX BUG PERFORMA] Ambil daftar siswa untuk 1 kelas: kalau cache
+    // semuaSiswaGlobal sudah siap, filter langsung di browser (instan).
+    // Kalau belum siap (mis. request awal masih berjalan / gagal), tetap
+    // fallback minta ke server per-kelas seperti sebelumnya agar fitur
+    // tidak pernah benar-benar rusak.
+    function ambilSiswaKelas(kelas, callback) {
+      if (semuaSiswaSiap) {
+        let hasil = semuaSiswaGlobal
+          .filter(function(s) { return s.kelas === kelas; })
+          .map(function(s) { return { nis: s.nis, nama: s.nama }; });
+        callback(hasil);
+      } else {
+        google.script.run.withSuccessHandler(callback).getSiswaByKelas(kelas);
+      }
+    }
+
     function lanjutkanGantiKelas(kelas) {
       let container = document.getElementById('tabelContainer');
       let placeholder = document.getElementById('placeholderSiswa');
@@ -1644,7 +1687,7 @@
       let siswaSearchEl = document.getElementById('siswaSearch');
       if (siswaSearchEl) siswaSearchEl.value = '';
 
-      google.script.run.withSuccessHandler(function(siswa) {
+      ambilSiswaKelas(kelas, function(siswa) {
         listNamaSiswaGlobal = siswa;
         localAbsenState = {}; localNilaiState = {}; localJNState = {};
         // Pakai JN terakhir sebagai default untuk semua siswa baru dimuat
@@ -1659,7 +1702,7 @@
         document.getElementById('jumlahSiswa').innerText = siswa.length;
         renderTabelSiswa();
         showToast(`Berhasil memuat ${siswa.length} siswa ${kelas}.`, "success");
-      }).getSiswaByKelas(kelas);
+      });
     }
 
     function renderTabelSiswa() {
@@ -3021,7 +3064,33 @@
     }
     function prosesAcak() {
       let num = parseInt(document.getElementById('jumlahKelompokInput').value) || 2;
-      let shuffled = [...listNamaSiswaGlobal].sort(() => Math.random() - 0.5);
+      let excludeTidakHadir = document.getElementById('kelompokExcludeTidakHadir').checked;
+
+      // Sumber siswa: seluruh siswa kelas, atau hanya yang berstatus Hadir (H)
+      // kalau opsi "Kecualikan siswa yang tidak hadir" dicentang. Status S/I/A/B
+      // (Sakit/Izin/Alpa/Bolos) diambil dari data presensi yang sudah diisi di
+      // tab Presensi (localAbsenState), bukan dari server, supaya langsung
+      // sinkron dengan apa yang guru centang hari itu.
+      let sumberSiswa = listNamaSiswaGlobal.filter(function(_, idx) {
+        if (!excludeTidakHadir) return true;
+        return (localAbsenState[idx] || 'H') === 'H';
+      });
+
+      let infoEl = document.getElementById('kelompokExcludeInfo');
+      let jumlahDikecualikan = listNamaSiswaGlobal.length - sumberSiswa.length;
+      if (excludeTidakHadir && jumlahDikecualikan > 0) {
+        infoEl.innerText = `${jumlahDikecualikan} siswa tidak hadir (S/I/A/B) dikecualikan. Sisa ${sumberSiswa.length} siswa diacak.`;
+      } else {
+        infoEl.innerText = 'Siswa berstatus Sakit / Izin / Alpa / Bolos di tab Presensi hari ini tidak akan dimasukkan ke kelompok.';
+      }
+
+      if (sumberSiswa.length === 0) {
+        document.getElementById('hasilKelompokContainer').innerHTML = '';
+        showToast("Tidak ada siswa berstatus Hadir untuk diacak. Isi dulu presensi di tab Presensi.", "error");
+        return;
+      }
+
+      let shuffled = [...sumberSiswa].sort(() => Math.random() - 0.5);
       let kelompokList = Array.from({ length: num }, () => []);
       shuffled.forEach((siswaObj, idx) => { kelompokList[idx % num].push(siswaObj.nama); });
 
