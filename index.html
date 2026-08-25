@@ -420,7 +420,7 @@
             </div>
           </div>
           
-          <div class="p-4 flex justify-end" style="background:#0d000f60;border-top:1px solid #ff224420;">
+          <div class="p-4 flex flex-col items-stretch sm:items-end gap-2" style="background:#0d000f60;border-top:1px solid #ff224420;">
             <button onclick="simpanKeDatabase()" id="btnSimpan" class="w-full sm:w-auto text-white font-black text-xs px-6 py-3.5 rounded-xl active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer" style="background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 20px #ff224445,0 0 40px #b026ff20;">
               <span class="material-icons-sharp text-base font-bold">cloud_done</span> 
               <span id="btnTextSimpan">Simpan Rekap Presensi</span>
@@ -1322,7 +1322,7 @@
     //  Cara deploy: GAS Editor → Deploy → New deployment → Web App
     //               Execute as: Me | Who has access: Anyone
     // ============================================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwM4il3-ge2ZG0ifrArLEt94SqNvr70wMxNvMKlt2QdECDnb8_7nKYebqm0QzumPwZt/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwMj99PPqdj7FIE8UFAHoOTn87bU2nOKtcBHi_QnseLcc-PV8OdwEIyHI4b-wpM1EuY/exec';
 
     // Helper: memanggil fungsi GAS via fetch (pengganti google.script.run)
     // Mengembalikan Promise
@@ -1421,6 +1421,8 @@
     let currentTab = 'presensi'; 
     let timerInterval; let timerSisaWaktu = 300; let timerBerjalan = false;
     let localAbsenState = {}; let localNilaiState = {}; let localJNState = {};
+    let jurnalSortedGlobal = []; // [FITUR EDIT DATA] cache jurnal terurut, dipakai editJurnalEntry(idx)
+    let editModeInfo = null;     // [FITUR EDIT DATA] { tanggalEdit, kelas, materi, tanggalTampil } saat sedang mengedit rekap lama
     let kelasAktifSebelumnya = ''; // [FIX BUG 2] Untuk rollback dropdown jika ganti kelas dibatalkan
     let jurnalPanelOpen = false;
 
@@ -1901,10 +1903,17 @@
         });
       });
 
-      let payload = { tipe: currentTab, kelas: kelas, materi: materi, catatan: catatan, jp: jp, keterangan: keterangan, siswa: dataSiswaFinal };
+      // [FITUR EDIT DATA] Kalau sedang mengedit rekap lama, sertakan tanggal aslinya
+      // supaya backend meng-UPDATE baris lama itu, bukan membuat baris baru hari ini.
+      let tanggalEdit = editModeInfo ? editModeInfo.tanggalEdit : null;
+      let payload = { tipe: currentTab, kelas: kelas, materi: materi, catatan: catatan, jp: jp, keterangan: keterangan, siswa: dataSiswaFinal, tanggalEdit: tanggalEdit };
 
       google.script.run.withSuccessHandler(function(res) {
         btn.disabled = false;
+        // Selesai mengedit → keluar dari mode edit, kembali ke mode input rekap baru
+        editModeInfo = null;
+        let badge = document.getElementById('editModeBadge');
+        if (badge) badge.remove();
         document.getElementById('btnTextSimpan').innerText = currentTab === 'presensi' ? "Simpan Rekap Presensi" : "Simpan Rekap Penilaian";
         renderTabelSiswa();
         tampilSuccessPopup(payload, res);
@@ -3486,6 +3495,7 @@
 
       // Sort terbaru di atas
       let sorted = [...data].sort((a, b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
+      jurnalSortedGlobal = sorted; // [FITUR EDIT DATA] dipakai oleh editJurnalEntry(idx)
 
       sorted.forEach((j, idx) => {
         let isPresensi = j.tipe === 'presensi';
@@ -3557,6 +3567,9 @@
               <span class="px-2.5 py-1 text-[10px] font-black rounded-lg bg-${tipeColor}-500/15 text-${tipeColor}-300 border border-${tipeColor}-500/20 uppercase tracking-wider">${tipeLabel}</span>
               <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-white/5 text-slate-400 border border-white/10">${(j.siswa||[]).length} siswa</span>
               ${j.siswa && j.siswa.length > 0 ? `<button onclick="toggleDetailJurnal('detail_${idx}', this)" class="px-2.5 py-1 text-[10px] font-black rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/20 cursor-pointer hover:bg-purple-500/25 transition-all">Detail ▾</button>` : ''}
+              <button onclick="editJurnalEntry(${idx})" title="Edit data rekap ini" class="px-2.5 py-1 text-[10px] font-black rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/20 cursor-pointer hover:bg-amber-500/25 transition-all flex items-center gap-1">
+                <span class="material-icons-sharp text-xs">edit</span>Edit
+              </button>
             </div>
           </div>
           ${badgeStats ? `<div class="flex flex-wrap gap-1.5 mt-3">${badgeStats}</div>` : ''}
@@ -3572,6 +3585,109 @@
       if (!el) return;
       let isHidden = el.classList.toggle('hidden');
       btn.innerText = isHidden ? 'Detail ▾' : 'Tutup ▴';
+    }
+
+    // ============================================================
+    //  [FITUR EDIT DATA] Muat ulang rekap presensi/penilaian yang
+    //  SUDAH dikirim ke sheet, agar bisa dikoreksi & dikirim ulang.
+    //  Saat dikirim ulang, backend akan meng-UPDATE baris lama
+    //  (bukan bikin baris baru) karena tanggalEdit ikut dikirim.
+    // ============================================================
+    function editJurnalEntry(idx) {
+      let j = jurnalSortedGlobal[idx];
+      if (!j) { showToast('Data tidak ditemukan.', 'error'); return; }
+
+      // Tutup modal Jurnal supaya guru langsung lihat form terisi
+      let modal = document.getElementById('jurnalModal');
+      if (modal && !modal.classList.contains('hidden')) toggleJurnalModal();
+
+      document.getElementById('dropdownKelas').value = j.kelas;
+      kelasAktifSebelumnya = j.kelas;
+
+      let container = document.getElementById('tabelContainer');
+      let placeholder = document.getElementById('placeholderSiswa');
+      let loading = document.getElementById('loadingSiswa');
+      placeholder.classList.add('hidden'); loading.classList.remove('hidden'); container.classList.add('hidden');
+
+      ambilSiswaKelas(j.kelas, function(siswa) {
+        listNamaSiswaGlobal = siswa;
+        localAbsenState = {}; localNilaiState = {}; localJNState = {};
+
+        siswa.forEach(function(s, index) {
+          let match = (j.siswa || []).find(function(x) { return String(x.nis) === String(s.nis); });
+          localAbsenState[index] = (match && match.status) ? match.status : 'H';
+          localNilaiState[index] = (match && match.nilai !== null && match.nilai !== '' && match.nilai !== undefined)
+            ? parseFloat(match.nilai) : 80;
+          localJNState[index] = 1;
+        });
+
+        document.getElementById('materi').value = j.materi || '';
+        document.getElementById('catatan').value = j.catatan || '';
+        document.getElementById('jp').value = j.jp || 2;
+        document.getElementById('keterangan').value = '';
+
+        // Pindah ke tab yang sesuai (presensi/penilaian) tanpa memicu
+        // simpanStateKeMemory/reset seperti switchTab() biasa
+        currentTab = (j.tipe === 'penilaian') ? 'penilaian' : 'presensi';
+        let btnPresensi = document.getElementById('tabBtnPresensi');
+        let btnPenilaian = document.getElementById('tabBtnPenilaian');
+        let thAksi = document.getElementById('thAksi');
+        let btnTextSimpan = document.getElementById('btnTextSimpan');
+        if (currentTab === 'presensi') {
+          btnPresensi.style.cssText = "background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 16px #ff224440;color:#fff;";
+          btnPenilaian.style.cssText = "background:transparent;color:#00d4ff80;box-shadow:none;";
+          if (thAksi) thAksi.innerText = "Status Presensi";
+        } else {
+          btnPenilaian.style.cssText = "background:linear-gradient(135deg,#ff2244,#b026ff);box-shadow:0 0 16px #ff224440;color:#fff;";
+          btnPresensi.style.cssText = "background:transparent;color:#00d4ff80;box-shadow:none;";
+          if (thAksi) thAksi.innerText = "Nilai & JN";
+        }
+
+        editModeInfo = { tanggalEdit: j.tanggalRaw, kelas: j.kelas, materi: j.materi, tanggalTampil: j.tanggal };
+        tampilkanBadgeEditMode();
+
+        loading.classList.add('hidden'); container.classList.remove('hidden');
+        document.getElementById('jumlahSiswa').innerText = siswa.length;
+        renderTabelSiswa();
+
+        btnTextSimpan.innerText = 'Perbarui Rekap ' + (currentTab === 'presensi' ? 'Presensi' : 'Penilaian');
+        showToast('Mode edit aktif: "' + (j.materi || '-') + '" (' + j.tanggal + '). Ubah data lalu klik simpan.', 'warning');
+
+        let anchor = document.getElementById('dropdownKelas');
+        if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    // Tampilkan/perbarui badge kecil di atas tombol Simpan yang menandakan sedang mode edit
+    function tampilkanBadgeEditMode() {
+      let existing = document.getElementById('editModeBadge');
+      if (existing) existing.remove();
+      if (!editModeInfo) return;
+
+      let btnSimpan = document.getElementById('btnSimpan');
+      if (!btnSimpan || !btnSimpan.parentNode) return;
+
+      let badge = document.createElement('div');
+      badge.id = 'editModeBadge';
+      badge.className = 'w-full flex items-center justify-between gap-2 mb-2 px-3 py-2 rounded-xl';
+      badge.style.cssText = 'background:#ffb02015;border:1px solid #ffb02040;';
+      badge.innerHTML = `
+        <span class="text-[10px] font-black text-amber-300 flex items-center gap-1.5">
+          <span class="material-icons-sharp text-xs">edit</span>
+          Mode Edit &mdash; ${escapeHtml(editModeInfo.materi || '-')} (${escapeHtml(editModeInfo.tanggalTampil || '')})
+        </span>
+        <button type="button" onclick="batalModeEdit()" class="text-[10px] font-black text-slate-400 hover:text-slate-200 underline cursor-pointer">Batal</button>
+      `;
+      btnSimpan.parentNode.insertBefore(badge, btnSimpan);
+    }
+
+    // Batalkan mode edit: kembali seperti input rekap baru (tanggal hari ini)
+    function batalModeEdit() {
+      editModeInfo = null;
+      let badge = document.getElementById('editModeBadge');
+      if (badge) badge.remove();
+      document.getElementById('btnTextSimpan').innerText = currentTab === 'presensi' ? "Simpan Rekap Presensi" : "Simpan Rekap Penilaian";
+      showToast('Mode edit dibatalkan.', 'warning');
     }
   </script>
 </body>
