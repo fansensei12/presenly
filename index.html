@@ -1465,6 +1465,90 @@
     let semuaSiswaGlobal = [];
     let semuaSiswaSiap = false;
 
+    // ── [AUTO URUT + AUTO SINKRON SISWA] ────────────────────────────
+    // Urutan: Kelas (natural: 7A < 7B < 10A) → Nama (A-Z) → NIS (angka).
+    // Daftar siswa di-refresh otomatis di latar belakang (tiap 60 dtk,
+    // saat tab dibuka kembali, dan setiap ganti kelas), jadi siswa yang
+    // baru ditambah di baris paling bawah sheet langsung muncul di posisi
+    // abjad yang benar tanpa perlu refresh halaman.
+    let sedangRefreshSiswa = false;
+    let terakhirRefreshSiswa = 0;
+
+    function bandingNatural(a, b) {
+      return String(a == null ? '' : a).localeCompare(String(b == null ? '' : b), 'id', { numeric: true, sensitivity: 'base' });
+    }
+    function urutkanKelas(arr) {
+      return (arr || []).slice().sort(bandingNatural);
+    }
+    function urutkanSiswa(arr) {
+      return (arr || []).slice().sort(function(a, b) {
+        return bandingNatural(a.kelas, b.kelas) ||
+               String(a.nama || '').trim().localeCompare(String(b.nama || '').trim(), 'id', { sensitivity: 'base' }) ||
+               bandingNatural(a.nis, b.nis);
+      });
+    }
+
+    function refreshDaftarSiswa(paksa) {
+      if (sedangRefreshSiswa) return;
+      if (!paksa && (Date.now() - terakhirRefreshSiswa) < 20000) return;
+      sedangRefreshSiswa = true;
+      google.script.run.withSuccessHandler(function(data) {
+        sedangRefreshSiswa = false;
+        terakhirRefreshSiswa = Date.now();
+        semuaSiswaGlobal = urutkanSiswa(data || []);
+        semuaSiswaSiap = true;
+        sinkronkanDaftarAktif();
+      }).withFailureHandler(function() {
+        sedangRefreshSiswa = false; // gagal diam-diam, coba lagi di siklus berikutnya
+      }).getSemuaSiswa();
+    }
+
+    // Kalau daftar kelas yang sedang tampil berbeda dengan data terbaru
+    // (ada siswa baru / dihapus / diganti nama), bangun ulang tabel dengan
+    // MEMPERTAHANKAN status presensi, nilai & JN yang sudah diisi (dicocokkan lewat NIS).
+    function sinkronkanDaftarAktif() {
+      let kelas = kelasAktifSebelumnya;
+      let sel = document.getElementById('dropdownKelas');
+      let container = document.getElementById('tabelContainer');
+      if (!kelas || editModeInfo || !sel || sel.value !== kelas || !container || container.classList.contains('hidden')) return;
+
+      let baru = semuaSiswaGlobal
+        .filter(function(s) { return s.kelas === kelas; })
+        .map(function(s) { return { nis: s.nis, nama: s.nama }; });
+      let tanda = function(a) { return a.map(function(s) { return s.nis + '|' + s.nama; }).join('\n'); };
+      if (tanda(baru) === tanda(listNamaSiswaGlobal)) return;
+
+      simpanStateKeMemory(); // amankan input yang sedang tampil di layar
+      let lama = {};
+      listNamaSiswaGlobal.forEach(function(s, i) {
+        lama[s.nis] = { a: localAbsenState[i], n: localNilaiState[i], j: localJNState[i] };
+      });
+      let savedJN = 1;
+      try { savedJN = parseInt(localStorage.getItem('presenly_jn_global')) || 1; } catch(e) {}
+
+      let jumlahBaru = baru.filter(function(s) { return !lama[s.nis]; }).length;
+      listNamaSiswaGlobal = baru;
+      localAbsenState = {}; localNilaiState = {}; localJNState = {};
+      baru.forEach(function(s, i) {
+        let o = lama[s.nis];
+        localAbsenState[i] = (o && o.a) ? o.a : 'H';
+        localNilaiState[i] = (o && o.n !== undefined) ? o.n : 80;
+        localJNState[i]    = (o && o.j !== undefined) ? o.j : savedJN;
+      });
+
+      document.getElementById('jumlahSiswa').innerText = baru.length;
+      renderTabelSiswa();
+      let cari = document.getElementById('siswaSearch');
+      if (cari && cari.value.trim() !== '') filterSiswaTabel();
+      showToast(jumlahBaru > 0
+        ? `Daftar siswa diperbarui: ${jumlahBaru} siswa baru ditambahkan.`
+        : 'Daftar siswa diperbarui sesuai data terbaru.', "success");
+    }
+
+    setInterval(function() { if (!document.hidden) refreshDaftarSiswa(false); }, 60000);
+    document.addEventListener('visibilitychange', function() { if (!document.hidden) refreshDaftarSiswa(false); });
+    window.addEventListener('focus', function() { refreshDaftarSiswa(false); });
+
     function toggleJurnalPanel() {
       let body = document.getElementById('jurnalPanelBody');
       let icon = document.getElementById('jurnalPanelIcon');
@@ -1549,7 +1633,8 @@
       // perlu tunggu request baru ke server (yang kena overhead cold-start
       // Apps Script tiap kali dipanggil).
       google.script.run.withSuccessHandler(function(data) {
-        semuaSiswaGlobal = data || [];
+        semuaSiswaGlobal = urutkanSiswa(data || []);
+        terakhirRefreshSiswa = Date.now();
         semuaSiswaSiap = true;
       }).withFailureHandler(function() {
         // Gagal ambil cache awal bukan masalah besar — sistem otomatis
@@ -1560,7 +1645,7 @@
       google.script.run.withSuccessHandler(function(arrKelas) {
         let select = document.getElementById('dropdownKelas');
         select.innerHTML = '<option value="">-- Tentukan Kelas --</option>';
-        arrKelas.forEach(function(kls) {
+        urutkanKelas(arrKelas).forEach(function(kls) {
           let opt = document.createElement('option'); opt.value = kls; opt.innerHTML = kls; select.appendChild(opt);
         });
         showToast("Koneksi database Presenly terhubung.", "success");
@@ -1696,9 +1781,11 @@
         let hasil = semuaSiswaGlobal
           .filter(function(s) { return s.kelas === kelas; })
           .map(function(s) { return { nis: s.nis, nama: s.nama }; });
-        callback(hasil);
+        callback(urutkanSiswa(hasil)); // urut Nama A-Z, lalu NIS
       } else {
-        google.script.run.withSuccessHandler(callback).getSiswaByKelas(kelas);
+        google.script.run.withSuccessHandler(function(hasil) {
+          callback(urutkanSiswa(hasil || []));
+        }).getSiswaByKelas(kelas);
       }
     }
 
@@ -1736,6 +1823,8 @@
         document.getElementById('jumlahSiswa').innerText = siswa.length;
         renderTabelSiswa();
         showToast(`Berhasil memuat ${siswa.length} siswa ${kelas}.`, "success");
+        // Cek diam-diam ke server: kalau ada siswa baru, tabel otomatis diperbarui
+        setTimeout(function() { refreshDaftarSiswa(false); }, 300);
       });
     }
 
